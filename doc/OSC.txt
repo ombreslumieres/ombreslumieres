@@ -1,0 +1,16 @@
+OSC messages
+============
+Port: 31337
+Host: Where the Processing sketch runs.
+
+/spray/begin ,ii [x] [y]
+------------------------
+Begins to draw at x, y.
+
+/spray/at ,ii [x] [y]
+---------------------
+Continues (or begins) to draw at x, y.
+
+/spray/end
+----------
+Ends to draw.
