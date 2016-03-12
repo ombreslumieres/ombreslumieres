@@ -3,3 +3,5 @@
 .DS_Store
 ._*
 *.pyc
+.~lock.*.odg#
+application.macosx
