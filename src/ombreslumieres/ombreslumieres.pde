@@ -27,6 +27,9 @@ OscP5 osc_receiver;
 NetAddress osc_send_address;
 SyphonServer syphon_server;
 Path spray_path;
+boolean is_painting = false;
+int spray_x = 0;
+int spray_y = 0;
 
 void settings()
 {
@@ -34,7 +37,6 @@ void settings()
   // frameRate(FRAME_RATE);
   PJOGL.profile = 1; // taken from the Syphon examples
 }
-
 
 void setup()
 {
@@ -47,35 +49,109 @@ void setup()
   background(0);
 }
 
-
 void draw()
 {
-  if (mousePressed)
+  if (is_painting && spray_path != null)
   {
-    if (spray_path != null)
+    if (mousePressed)
     {
       spray_path.add(new Knot(mouseX, mouseY));
     }
   }
-  if(spray_path != null)
+  if (spray_path != null)
   {
     spray_path.draw();
   }
   syphon_server.sendScreen();
 }
 
-
-void mousePressed()
+void spray_at(int x, int y)
 {
-  Knot mouse_pos_knot = new Knot(mouseX, mouseY);
+  if (! is_painting)
+  {
+    spray_begin(x, y);
+  }
+  else
+  {
+    spray_path.add(new Knot(x, y));
+  }
+}
+
+void spray_begin(int x, int y)
+{
+  is_painting = true;
+  Knot mouse_pos_knot = new Knot(x, y);
   spray_path = new Path(mouse_pos_knot, 10);
 }
 
+void spray_end()
+{
+  is_painting = false;
+}
+
+void mousePressed()
+{
+  spray_begin(mouseX, mouseY);
+}
+
+void mouseReleased()
+{
+  spray_end();
+}
 
 /**
  * Incoming osc message are forwarded to the oscEvent method.
  */
 void oscEvent(OscMessage message)
 {
-  print("Received OSC " + message.addrPattern() + " " + message.typetag());
+  print("Received " + message.addrPattern() + " " + message.typetag() + "\n");
+  if (message.checkAddrPattern("/spray/begin"))
+  {
+    int x;
+    int y;
+    if (message.checkTypetag("ii"))
+    {
+      x = message.get(0).intValue();
+      y = message.get(1).intValue();
+    }
+    else if (message.checkTypetag("ff"))
+    {
+      x = (int) message.get(0).floatValue();
+      y = (int) message.get(1).floatValue();
+    }
+    else
+    {
+      print("bad typetag\n");
+      return;
+    }
+    println("  x = " + x + " y = " + y);
+    spray_begin(x, y);
+  }
+  else if (message.checkAddrPattern("/spray/at"))
+  {
+    int x;
+    int y;
+    if (message.checkTypetag("ii"))
+    {
+      println("oui");
+      x = message.get(0).intValue();
+      y = message.get(1).intValue();
+    }
+    else if (message.checkTypetag("ff"))
+    {
+      x = (int) message.get(0).floatValue();
+      y = (int) message.get(1).floatValue();
+    }
+    else
+    {
+      println("bad typetag");
+      return;
+    }
+    println("  x = " + x + " y = " + y);
+    spray_at(x, y);
+  }
+  if (message.checkAddrPattern("/spray/end"))
+  {
+    spray_end();
+  }
 }
