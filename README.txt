@@ -1,4 +1,4 @@
-Ombres et lumières
+Encres & lumières
 ==================
 License: GPL
 

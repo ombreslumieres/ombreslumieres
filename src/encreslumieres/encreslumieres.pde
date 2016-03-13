@@ -1,5 +1,5 @@
 /**
- * Ombres & lumières
+ * Encres & lumières
  * Spray paint controlled via OSC.
  * Syphon output.
  * Dependencies:
@@ -19,7 +19,7 @@ final int VIDEO_OUTPUT_WIDTH = 1280;
 final int VIDEO_OUTPUT_HEIGHT = 720;
 final int OSC_SEND_PORT = 13333;
 final String OSC_SEND_HOST = "127.0.0.1";
-final String SYPHON_SERVER_NAME = "ombres&lumieres";
+final String SYPHON_SERVER_NAME = "encres&lumieres";
 final boolean debug = false;
 
 PShader pointShader;
