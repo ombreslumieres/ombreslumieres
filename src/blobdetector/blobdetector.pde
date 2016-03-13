@@ -13,23 +13,64 @@ Capture cam;
 BlobDetection theBlobDetection;
 PImage img;
 boolean newFrame = false;
+int CAMERA_INDEX = 0;
+final int VIDEO_OUTPUT_WIDTH = 640;
+final int VIDEO_OUTPUT_HEIGHT = 480;
+final int VIDEO_INPUT_WIDTH = 320;
+final int VIDEO_INPUT_HEIGHT = 240;
+final int VIDEO_INPUT_FPS = 30;
+final float BLOB_BRIGHTNESS_THRESHOLD = 0.2f; // will detect bright areas whose luminosity if greater than this value
 
-/**
- * setup
- */
+void settings()
+{
+  size(VIDEO_OUTPUT_WIDTH, VIDEO_OUTPUT_HEIGHT);
+}
+
 void setup()
 {
-  size(640, 480);
-  cam = new Capture(this, 40 * 4, 30 * 4, 15);
+  String camera_name = guess_video_camera_name("/dev/video[0-9]*,size=320x240,fps=30");
+  cam = new Capture(this, VIDEO_INPUT_WIDTH, VIDEO_INPUT_HEIGHT, camera_name, VIDEO_INPUT_FPS);
   cam.start();
-        
+  
   // BlobDetection
   // img which will be sent to detection (a smaller copy of the cam frame);
-  img = new PImage(80, 60); 
+  img = new PImage(VIDEO_INPUT_WIDTH, VIDEO_INPUT_HEIGHT); 
   theBlobDetection = new BlobDetection(img.width, img.height);
   theBlobDetection.setPosDiscrimination(true);
-  theBlobDetection.setThreshold(0.2f);
-  // will detect bright areas whose luminosity > 0.2f;
+  theBlobDetection.setThreshold(BLOB_BRIGHTNESS_THRESHOLD);
+  // will detect bright areas whose luminosity > BLOB_BRIGHTNESS_THRESHOLD;
+}
+
+String guess_video_camera_name(String name_pattern)
+{
+  String[] cameras = Capture.list();
+  String camera_name = "";
+  int camera_index = 0;
+  
+  if (cameras.length == 0)
+  {
+    println("There are no cameras available for capture.");
+    exit();
+  }
+  else
+  {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++)
+    {
+      println("Camera index: " + i + ", name: " + cameras[i]);
+      if (match(cameras[i], name_pattern) != null)
+      {
+        camera_index = i;
+      }
+    }
+    if (cameras.length <= camera_index)
+    {
+      camera_index = 0;
+    }
+    println("Choosing camera index: " + camera_index + ", name: " + cameras[camera_index]);
+    camera_name = cameras[camera_index];
+  }
+  return camera_name;
 }
 
 /**
