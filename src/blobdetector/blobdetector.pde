@@ -20,6 +20,7 @@ final int VIDEO_INPUT_WIDTH = 320;
 final int VIDEO_INPUT_HEIGHT = 240;
 final int VIDEO_INPUT_FPS = 30;
 final float BLOB_BRIGHTNESS_THRESHOLD = 0.2f; // will detect bright areas whose luminosity if greater than this value
+final String VIDEO_CAMERA_NAME_PATTERN = "/dev/video[0-9]*,size=320x240,fps=30"; // play station 3 eye (linux)
 
 void settings()
 {
@@ -28,7 +29,7 @@ void settings()
 
 void setup()
 {
-  String camera_name = guess_video_camera_name("/dev/video[0-9]*,size=320x240,fps=30");
+  String camera_name = guess_video_camera_name(VIDEO_CAMERA_NAME_PATTERN);
   cam = new Capture(this, VIDEO_INPUT_WIDTH, VIDEO_INPUT_HEIGHT, camera_name, VIDEO_INPUT_FPS);
   cam.start();
   
@@ -41,6 +42,9 @@ void setup()
   // will detect bright areas whose luminosity > BLOB_BRIGHTNESS_THRESHOLD;
 }
 
+/**
+ * For the name pattern, see http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html
+ */
 String guess_video_camera_name(String name_pattern)
 {
   String[] cameras = Capture.list();
@@ -201,7 +205,7 @@ void fastblur(PImage img, int radius)
     yw += w;
   }
 
-  for (x=0;x<w;x++)
+  for (x = 0; x < w; x++)
   {
     rsum = gsum = bsum = 0;
     yp = -radius * w;
