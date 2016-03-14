@@ -5,3 +5,4 @@
 *.pyc
 .~lock.*.odg#
 application.macosx
+out
