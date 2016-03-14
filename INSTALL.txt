@@ -1,0 +1,15 @@
+Ubuntu 15.10
+------------
+Processing
+~~~~~~~~~~
+
+
+GStreamer
+~~~~~~~~~
+sudo apt-get install gstreamer0.10-plugins-good
+
+Try a pipeline::
+
+  ls -l /dev/video*
+  gst-launch-0.10 v4l2src device=/dev/video1 ! ffmpegcolorspace ! video/x-raw-rgb, width=640, height=480, bpp=32, depth=24 ! ximagesink
+
