@@ -89,7 +89,7 @@ String guess_video_camera_name(String name_pattern)
  */
 void captureEvent(Capture cam)
 {
-  println("capture event!");
+  //println("capture event!");
   cam.read();
   newFrame = true;
 }
@@ -103,7 +103,7 @@ void draw()
   {
     newFrame = false;
     image(cam, 0, 0, width, height);
-    println("copy image " + cam.width + "x" + cam.height + " to " + img.width + "x" + img.height);
+    //println("copy image " + cam.width + "x" + cam.height + " to " + img.width + "x" + img.height);
     img.copy(cam, 0, 0, cam.width, cam.height, 0, 0, img.width, img.height);
     fastblur(img, 2);
     theBlobDetection.computeBlobs(img.pixels);
