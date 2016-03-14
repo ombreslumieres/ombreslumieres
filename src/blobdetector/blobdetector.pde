@@ -19,6 +19,7 @@ final int VIDEO_OUTPUT_HEIGHT = 480;
 final int VIDEO_INPUT_WIDTH = 320;
 final int VIDEO_INPUT_HEIGHT = 240;
 final int VIDEO_INPUT_FPS = 30;
+final int DEFAULT_CAMERA_INDEX = 59;
 final float BLOB_BRIGHTNESS_THRESHOLD = 0.2f; // will detect bright areas whose luminosity if greater than this value
 final String VIDEO_CAMERA_NAME_PATTERN = "/dev/video[0-9]*,size=320x240,fps=30"; // play station 3 eye (linux)
 
@@ -29,10 +30,13 @@ void settings()
 
 void setup()
 {
+  println("Guess video camera name...");
   String camera_name = guess_video_camera_name(VIDEO_CAMERA_NAME_PATTERN);
+  println("create new catpure");
   cam = new Capture(this, VIDEO_INPUT_WIDTH, VIDEO_INPUT_HEIGHT, camera_name, VIDEO_INPUT_FPS);
+  println("start capture " + cam);
   cam.start();
-  
+  println("capture started");
   // BlobDetection
   // img which will be sent to detection (a smaller copy of the cam frame);
   img = new PImage(VIDEO_INPUT_WIDTH, VIDEO_INPUT_HEIGHT); 
@@ -47,9 +51,12 @@ void setup()
  */
 String guess_video_camera_name(String name_pattern)
 {
+  //return "/dev/video0,size=320x240,fps=30";
+  print("Listing caputre devices...");
   String[] cameras = Capture.list();
+  println("Done listing devices.");
   String camera_name = "";
-  int camera_index = 0;
+  int camera_index = DEFAULT_CAMERA_INDEX;
   
   if (cameras.length == 0)
   {
@@ -82,6 +89,7 @@ String guess_video_camera_name(String name_pattern)
  */
 void captureEvent(Capture cam)
 {
+  println("capture event!");
   cam.read();
   newFrame = true;
 }
@@ -95,6 +103,7 @@ void draw()
   {
     newFrame = false;
     image(cam, 0, 0, width, height);
+    println("copy image " + cam.width + "x" + cam.height + " to " + img.width + "x" + img.height);
     img.copy(cam, 0, 0, cam.width, cam.height, 0, 0, img.width, img.height);
     fastblur(img, 2);
     theBlobDetection.computeBlobs(img.pixels);
