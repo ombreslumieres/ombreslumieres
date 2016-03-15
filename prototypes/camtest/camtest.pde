@@ -27,8 +27,8 @@ void setup() {
   video.start();
 }
 
-void draw() {
-  
+void draw()
+{
   scale(2);
   opencv.loadImage(video);
 
@@ -38,10 +38,10 @@ void draw() {
   stroke(0, 255, 0);
   strokeWeight(3);
   Rectangle[] faces = opencv.detect();
-  println(faces.length);
+  // println(faces.length);
 
   for (int i = 0; i < faces.length; i++) {
-    println(faces[i].x + "," + faces[i].y);
+    // println(faces[i].x + "," + faces[i].y);
     rect(faces[i].x, faces[i].y, faces[i].width, faces[i].height);
   }
 }
