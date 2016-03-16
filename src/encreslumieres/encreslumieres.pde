@@ -110,7 +110,10 @@ void mouseReleased()
 
 void handle_force(String identifier, int force)
 {
-  println("/force " + force);
+  if (debug)
+  {
+    println("/force " + force);
+  }
   boolean force_was_pressed = force_is_pressed;
   if (force < 400)
   {
@@ -122,7 +125,10 @@ void handle_force(String identifier, int force)
   }
   if (! force_was_pressed && force_is_pressed)
   {
-    println("begin");
+    if (debug)
+    {
+      println("begin");
+    }
     spray_begin((int) blob_x, (int) blob_y);
   }
   else if (force_was_pressed && force_is_pressed)
@@ -131,14 +137,20 @@ void handle_force(String identifier, int force)
   }
   else if (force_was_pressed && ! force_is_pressed)
   {
-    println("end");
+    if (debug)
+    {
+      println("end");
+    }
     spray_end();
   }
 }
 
 void handle_blob(String identifier, float x, float y, float size)
 {
-  println("/blob " + x + ", " + y + " size=" + size);
+  if (debug)
+  {
+    println("/blob " + x + ", " + y + " size=" + size);
+  }
   blob_x = x;
   blob_y = y;
   blob_size = size;
