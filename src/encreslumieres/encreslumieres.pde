@@ -34,6 +34,7 @@ boolean force_is_pressed = false;
 float blob_x = 0.0;
 float blob_y = 0.0;
 float blob_size = 0.0;
+boolean force_was_pressed = false;
 
 void settings()
 {
@@ -55,6 +56,7 @@ void setup()
 
 void draw()
 {
+  create_points_if_needed();
   this.draw_path();  
   syphon_server.sendScreen();
 }
@@ -114,7 +116,7 @@ void handle_force(String identifier, int force)
   {
     println("/force " + force);
   }
-  boolean force_was_pressed = force_is_pressed;
+  force_was_pressed = force_is_pressed;
   if (force < 400)
   {
     force_is_pressed = true;
@@ -123,6 +125,11 @@ void handle_force(String identifier, int force)
   {
     force_is_pressed = false;
   }
+  //create_points_if_needed();
+}
+
+void create_points_if_needed()
+{
   if (! force_was_pressed && force_is_pressed)
   {
     if (debug)
