@@ -21,6 +21,8 @@ final int OSC_SEND_PORT = 13333;
 final String OSC_SEND_HOST = "127.0.0.1";
 final String SYPHON_SERVER_NAME = "encres&lumieres";
 final boolean debug = false;
+final int BLOB_INPUT_WIDTH = 640;
+final int BLOB_INPUT_HEIGHT = 480;
 
 PShader pointShader;
 OscP5 osc_receiver;
@@ -57,8 +59,18 @@ void setup()
 void draw()
 {
   create_points_if_needed();
-  this.draw_path();  
+  draw_cursor();
+  draw_path();
   syphon_server.sendScreen();
+}
+
+void draw_cursor()
+{
+  stroke(100);
+  noFill();
+  strokeWeight(1.0);
+  stroke(255, 0, 0);
+  ellipse(blob_x, blob_y, 30.0, 30.0);
 }
 
 synchronized void draw_path()
@@ -158,9 +170,20 @@ void handle_blob(String identifier, float x, float y, float size)
   {
     println("/blob " + x + ", " + y + " size=" + size);
   }
-  blob_x = x;
-  blob_y = y;
+  blob_x = map_x(x);
+  blob_y = map_y(y);
   blob_size = size;
+}
+
+float map_x(float value)
+{
+  return map(value, 0.0, BLOB_INPUT_WIDTH, 0.0, VIDEO_OUTPUT_WIDTH);
+}
+
+float map_y(float value)
+{
+  float height_3_4 = VIDEO_OUTPUT_WIDTH * (3.0 / 4.0);
+  return map(value, 0.0, BLOB_INPUT_HEIGHT, 0.0, height_3_4);
 }
 
 /**
