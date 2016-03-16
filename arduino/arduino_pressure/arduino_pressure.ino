@@ -61,6 +61,7 @@ void loop()
     if (lastValue != valueSendi)
     {
         OSCMessage msg("/force");
+        // TODO: add a string identifier as a 1st OSC argument
         msg.add(valueSendi);
         Udp.beginPacket(outIp, outPort);
         msg.send(Udp);
