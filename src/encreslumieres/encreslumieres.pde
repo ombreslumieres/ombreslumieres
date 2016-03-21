@@ -6,12 +6,11 @@
  * - oscP5
  * - syphon
  */
-
-import codeanticode.syphon.SyphonServer;
+// XXX comment out next line if not using Syphon
+//import codeanticode.syphon.SyphonServer;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
-
 
 final int OSC_RECEIVE_PORT = 31340;
 final int FRAME_RATE = 30;
@@ -27,7 +26,8 @@ final int BLOB_INPUT_HEIGHT = 480;
 PShader pointShader;
 OscP5 osc_receiver;
 NetAddress osc_send_address;
-SyphonServer syphon_server;
+// XXX comment out next line if not using Syphon
+//SyphonServer syphon_server;
 Path spray_path;
 boolean is_painting = false;
 int spray_x = 0;
@@ -50,7 +50,8 @@ void setup()
   // start oscP5, listening for incoming messages at a given port
   osc_receiver = new OscP5(this, OSC_RECEIVE_PORT);
   osc_send_address = new NetAddress(OSC_SEND_HOST, OSC_SEND_PORT);
-  syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
+  // XXX comment out next line if not using Syphon
+  //syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
   pointShader = loadShader("pointfrag.glsl", "pointvert.glsl");
   strokeCap(SQUARE);
   background(0);
@@ -61,7 +62,8 @@ void draw()
   create_points_if_needed();
   draw_cursor();
   draw_path();
-  syphon_server.sendScreen();
+  // XXX comment out next line if not using Syphon
+  // syphon_server.sendScreen();
 }
 
 void draw_cursor()
