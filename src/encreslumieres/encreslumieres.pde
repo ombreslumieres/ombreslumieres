@@ -41,12 +41,12 @@ boolean force_was_pressed = false;
 void settings()
 {
   size(VIDEO_OUTPUT_WIDTH, VIDEO_OUTPUT_HEIGHT, P3D);
-  // frameRate(FRAME_RATE);
   PJOGL.profile = 1; // taken from the Syphon examples
 }
 
 void setup()
 {
+  frameRate(FRAME_RATE);
   // start oscP5, listening for incoming messages at a given port
   osc_receiver = new OscP5(this, OSC_RECEIVE_PORT);
   osc_send_address = new NetAddress(OSC_SEND_HOST, OSC_SEND_PORT);
@@ -139,7 +139,6 @@ void handle_force(String identifier, int force)
   {
     force_is_pressed = false;
   }
-  //create_points_if_needed();
 }
 
 void create_points_if_needed()
@@ -225,56 +224,5 @@ void oscEvent(OscMessage message)
     }
     handle_blob(identifier, x, y, size);
   }
-  
-  /*
-  if (message.checkAddrPattern("/spray/begin"))
-  {
-    int x;
-    int y;
-    if (message.checkTypetag("ii"))
-    {
-      x = message.get(0).intValue();
-      y = message.get(1).intValue();
-    }
-    else if (message.checkTypetag("ff"))
-    {
-      x = (int) message.get(0).floatValue();
-      y = (int) message.get(1).floatValue();
-    }
-    else
-    {
-      print("bad typetag\n");
-      return;
-    }
-    println("  x = " + x + " y = " + y);
-    spray_begin(x, y);
-  }
-  else if (message.checkAddrPattern("/spray/at"))
-  {
-    int x;
-    int y;
-    if (message.checkTypetag("ii"))
-    {
-      println("oui");
-      x = message.get(0).intValue();
-      y = message.get(1).intValue();
-    }
-    else if (message.checkTypetag("ff"))
-    {
-      x = (int) message.get(0).floatValue();
-      y = (int) message.get(1).floatValue();
-    }
-    else
-    {
-      println("bad typetag");
-      return;
-    }
-    println("  x = " + x + " y = " + y);
-    spray_at(x, y);
-  }
-  if (message.checkAddrPattern("/spray/end"))
-  {
-    spray_end();
-  }
-  */
 }
+
