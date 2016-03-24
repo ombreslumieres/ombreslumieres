@@ -37,6 +37,7 @@ float blob_x = 0.0;
 float blob_y = 0.0;
 float blob_size = 0.0;
 boolean force_was_pressed = false;
+color spray_color = color(255, 127, 0);
 
 void settings()
 {
@@ -81,7 +82,9 @@ synchronized void draw_path()
   {
     if (mousePressed)
     {
-      spray_path.add(new Knot(mouseX, mouseY));
+      Knot knot = new Knot(mouseX, mouseY);
+      knot.setColor(spray_color);
+      spray_path.add(knot);
     }
   }
   if (spray_path != null)
@@ -98,15 +101,18 @@ synchronized void spray_at(int x, int y)
   }
   else
   {
-    spray_path.add(new Knot(x, y));
+    Knot knot = new Knot(x, y);
+    knot.setColor(spray_color);
+    spray_path.add(knot);
   }
 }
 
 synchronized void spray_begin(int x, int y)
 {
   is_painting = true;
-  Knot mouse_pos_knot = new Knot(x, y);
-  spray_path = new Path(mouse_pos_knot, 10);
+  Knot knot = new Knot(x, y);
+  knot.setColor(spray_color);
+  spray_path = new Path(knot, 10);
 }
 
 synchronized void spray_end()
@@ -176,6 +182,15 @@ void handle_blob(String identifier, float x, float y, float size)
   blob_size = size;
 }
 
+void handle_color(String identifier, int r, int g, int b)
+{
+  if (debug)
+  {
+    println("/color " + r + ", " + g + ", " + b);
+  }
+  spray_color = color(r, g, b);
+}
+
 float map_x(float value)
 {
   return map(value, 0.0, BLOB_INPUT_WIDTH, 0.0, VIDEO_OUTPUT_WIDTH);
@@ -208,7 +223,7 @@ void oscEvent(OscMessage message)
     }
     handle_force(identifier, force);
   }
-  if (message.checkAddrPattern("/blob"))
+  else if (message.checkAddrPattern("/blob"))
   {
     // TODO: parse string identifier as a first OSC argument
     String identifier = "unknown";
@@ -224,5 +239,27 @@ void oscEvent(OscMessage message)
     }
     handle_blob(identifier, x, y, size);
   }
+  else if (message.checkAddrPattern("/color"))
+  {
+    // TODO: parse string identifier as a first OSC argument
+    String identifier = "unknown";
+    int r = 255;
+    int g = 255;
+    int b = 255;
+    if (message.checkTypetag("siii"))
+    {
+      //identifier = message.get(0).StringValue();
+      r = message.get(1).intValue();
+      g = message.get(2).intValue();
+      b = message.get(3).intValue();
+    }
+    else if (message.checkTypetag("sfff"))
+    {
+      //identifier = message.get(0).StringValue();
+      r = (int) message.get(1).floatValue();
+      g = (int) message.get(2).floatValue();
+      b = (int) message.get(3).floatValue();
+    }
+    handle_color(identifier, r, g, b);
+  }
 }
-

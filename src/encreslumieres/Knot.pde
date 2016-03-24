@@ -35,6 +35,11 @@ class Knot extends PVector
     this.tint = c;
   }
   
+  color getColor()
+  {
+    return this.tint;
+  }
+  
   PVector getPos()
   {
     return new PVector(x, y);

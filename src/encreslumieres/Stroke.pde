@@ -41,7 +41,7 @@ class Path
   void add(Knot p)
   {
     int size = this.pointList.size();
-    this.previousKnot = this.pointList.get(size-1);
+    this.previousKnot = this.pointList.get(size - 1);
     this.currentKnot = p;
     // Compute the vector from previous to current knot
     PVector prevPos = this.previousKnot.getPos();
@@ -58,13 +58,14 @@ class Path
         PVector.mult(velocity, 1 / numSteps * i, stepper);
         stepper.add(prevPos);
         Knot k = new Knot(stepper.x, stepper.y);
-        p.setColor(color(0, 255, 0));
+        k.setColor(p.getColor());
+        //p.setColor(color(0, 255, 0));
         this.pointList.add(k);
       }
     }
     else
     {
-      p.setColor(color(255, 0, 0));
+      // p.setColor(color(255, 0, 0));
       this.pointList.add(p);
     }
   }
