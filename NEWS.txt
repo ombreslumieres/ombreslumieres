@@ -1,6 +1,10 @@
 Encres & Lumieres release notes
 ===============================
 
+2016-??-?? - 0.2.0
+------------------
+*
+
 2016-03-28 - 0.1.0
 ------------------
 * One color spray paiting shader
