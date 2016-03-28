@@ -1,0 +1,33 @@
+OSC message signatures for Encres & Lumieres
+============================================
+
+blob
+----
+/blob ,sfff
+/color ,siii
+
+* Argument 1: spray identifier.
+* Argument 2: x [0-640]
+* Argument 3: y [0-480]
+* Argument 4: size [0-1000]
+
+
+force
+-----
+/force ,sf
+/color ,si
+
+* Argument 1: spray identifier.
+* Argument 2: force [0-1023] - If it's < 400, it means it's pressed.
+
+
+color
+-----
+/color ,sfff
+/color ,siii
+
+* Argument 1: spray identifier.
+* Argument 2: red [0-255]
+* Argument 3: green [0-255]
+* Argument 4: blue [0-255]
+
