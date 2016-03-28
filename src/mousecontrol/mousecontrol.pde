@@ -108,6 +108,7 @@ void draw_cursor()
 void send_blob()
 {
   OscMessage message = new OscMessage("/blob");
+  message.add("default");
   message.add(blob_x);
   message.add(blob_y);
   message.add(blob_size);
@@ -117,6 +118,7 @@ void send_blob()
 void send_color(float r, float g, float b)
 {
   OscMessage message = new OscMessage("/color");
+  message.add("default");
   message.add(r);
   message.add(g);
   message.add(b);
@@ -127,6 +129,7 @@ void send_color(float r, float g, float b)
 void send_force()
 {
   OscMessage message = new OscMessage("/force");
+  message.add("default");
   if (force_is_pressed)
   {
     message.add(0); // FIXME: if force < 400, it means it's pressed. Counter-intuitive, I know.

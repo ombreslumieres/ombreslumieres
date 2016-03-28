@@ -179,7 +179,7 @@ void handle_blob(String identifier, float x, float y, float size)
   }
   blob_x = map_x(x);
   blob_y = map_y(y);
-  blob_size = size;
+  blob_size = size; // unused
 }
 
 void handle_color(String identifier, int r, int g, int b)
@@ -213,11 +213,19 @@ void oscEvent(OscMessage message)
     // TODO: parse string identifier as a first OSC argument
     String identifier = "unknown";
     int force = 0;
-    if (message.checkTypetag("i"))
+    if (message.checkTypetag("si"))
+    {
+      force = message.get(1).intValue();
+    }
+    else if (message.checkTypetag("sf"))
+    {
+      force = (int) message.get(1).floatValue();
+    }
+    else if (message.checkTypetag("i")) // FIXME: remove this legacy signature
     {
       force = message.get(0).intValue();
     }
-    else if (message.checkTypetag("f"))
+    else if (message.checkTypetag("f"))  // FIXME: remove this legacy signature
     {
       force = (int) message.get(0).floatValue();
     }
