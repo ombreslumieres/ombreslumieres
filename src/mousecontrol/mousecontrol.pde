@@ -1,3 +1,9 @@
+/**
+ * Sends OSC messages to our main sketch.
+ * - Mouse around the mouse and press its first button
+ * - Press keys 1,2,3,4,5,6 to change color.
+ */
+
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
