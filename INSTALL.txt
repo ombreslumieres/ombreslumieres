@@ -1,3 +1,7 @@
+Install blobdetective
+---------------------
+See https://github.com/interferences-at/blobdetective
+
 Ubuntu 15.10
 ------------
 Processing
