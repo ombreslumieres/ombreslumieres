@@ -16,7 +16,7 @@ final int OSC_RECEIVE_PORT = 31340;
 final int OSC_SEND_PORT = 13333;
 final String OSC_SEND_HOST = "127.0.0.1";
 final String SYPHON_SERVER_NAME = "encres&lumieres";
-final boolean debug = false;
+final boolean debug = false; // also draw a red stroke
 final int BLOB_INPUT_WIDTH = 640;
 final int BLOB_INPUT_HEIGHT = 480;
 
@@ -76,23 +76,16 @@ void setup()
 
 void draw()
 {
-  draw_cursor();
+  background(0);
+  create_points_if_needed();
   draw_graffiti();
+  draw_cursor();
   // XXX comment out next line if not using Syphon
   // syphon_server.sendScreen();
 }
 
 void draw_graffiti()
 {
-  spray_manager.setColor(spray_color);
-  spray_manager.setWeight(weight);
-  //println(weight);
-
-  if (mousePressed)
-  {
-    graffiti_add_knot_to_stroke(mouseX, mouseY, weight);
-  }
-  
   paintscreen.beginDraw();
   paintscreen.strokeCap(SQUARE);
   if (spray_manager != null)
@@ -169,7 +162,7 @@ void handle_force(String identifier, int force)
 {
   if (debug)
   {
-    println("/force " + force);
+    // println("/force " + identifier + " " + force);
   }
   force_was_pressed = force_is_pressed;
   if (force < 400)
@@ -186,7 +179,7 @@ void handle_blob(String identifier, float x, float y, float size)
 {
   if (debug)
   {
-    println("/blob " + x + ", " + y + " size=" + size);
+    // println("/blob " + x + ", " + y + " size=" + size);
   }
   blob_x = map_x(x);
   blob_y = map_y(y);
@@ -215,6 +208,15 @@ float map_y(float value)
 
 void create_points_if_needed()
 {
+  spray_manager.setColor(spray_color);
+  spray_manager.setWeight(weight);
+  //println(weight);
+
+  if (mousePressed)
+  {
+    graffiti_add_knot_to_stroke(mouseX, mouseY, weight);
+  }
+  
   if (! force_was_pressed && force_is_pressed)
   {
     if (debug)
