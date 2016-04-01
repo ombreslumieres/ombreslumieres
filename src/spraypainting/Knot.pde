@@ -44,7 +44,7 @@ class Knot extends PVector
   }
   
   /**
-   * FIXME: accesses the global variable pointShader.
+   * FIXME: accesses the global variable global_point_shader.
    */
   void draw(PGraphics targetBuffer)
   {
@@ -54,12 +54,12 @@ class Knot extends PVector
     dir.normalize();
     if (! isDrawn)
     {
-      pointShader.set("weight", this.size);
-      pointShader.set("direction", dir.x, dir.y);
-      pointShader.set("rotation", random(0.0, 1.0), random(0.0, 1.0));
-      pointShader.set("scale", 0.3); 
-      pointShader.set("soften", 1.0); // towards 0.0 for harder brush, towards 2.0 for lighter brush
-      pointShader.set("depthOffset", this.noiseDepth);
+      global_point_shader.set("weight", this.size);
+      global_point_shader.set("direction", dir.x, dir.y);
+      global_point_shader.set("rotation", random(0.0, 1.0), random(0.0, 1.0));
+      global_point_shader.set("scale", 0.3); 
+      global_point_shader.set("soften", 1.0); // towards 0.0 for harder brush, towards 2.0 for lighter brush
+      global_point_shader.set("depthOffset", this.noiseDepth);
       
       // Draw in the buffer (if one was defined) or directly on the viewport
       if (targetBuffer != null)
@@ -67,7 +67,7 @@ class Knot extends PVector
         println("drawing");
         targetBuffer.strokeWeight(this.size);
         targetBuffer.stroke(this.col);
-        targetBuffer.shader(pointShader, POINTS);
+        targetBuffer.shader(global_point_shader, POINTS);
         targetBuffer.point(x, y); 
       }
       //else point(x,y);

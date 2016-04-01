@@ -1,8 +1,8 @@
 // http://glsl.heroku.com/e#4633.5
 // Wall texture from: http://texturez.com/textures/concrete/4092
 boolean debug = false;
-SprayManager sprayCan;
-PShader pointShader;
+SprayManager spray_manager;
+PShader global_point_shader;
 // Spray density distribution expressed in grayscale gradient
 PImage sprayMap;
 float weight;
@@ -16,19 +16,19 @@ void setup()
 {
   //size(640, , P3D);
   size(displayWidth, displayHeight, P3D);
-  frameRate(60);  
+  frameRate(60);
   paintscreen = createGraphics(width, height, P3D);
-  wall = loadImage("wallTexture.jpg");
-  sprayCan = new SprayManager();
+  wall = loadImage("background.png");
+  spray_manager = new SprayManager();
   sprayMap = loadImage("sprayMap.png");
   depthOffset = 0.0;
   offsetVel = 0.0005;
-  pointShader = loadShader("pointfrag.glsl", "pointvert.glsl");  
-  //pointShader.set("sharpness", 0.9);
-  pointShader.set( "sprayMap", sprayMap );
+  global_point_shader = loadShader("pointfrag.glsl", "pointvert.glsl");  
+  //global_point_shader.set("sharpness", 0.9);
+  global_point_shader.set("sprayMap", sprayMap);
   //background(0);
   paintscreen.beginDraw();
-  paintscreen.image(wall,0,0);
+  paintscreen.image(wall, 0, 0);
   paintscreen.endDraw();
 }
 
@@ -41,23 +41,23 @@ void draw()
   float hue = animate * 50;
   color col = color(hue, 255, 200);
   colorMode(RGB);
-  sprayCan.setColor(col);
-  sprayCan.setWeight(weight);
+  spray_manager.setColor(col);
+  spray_manager.setWeight(weight);
   //println(weight);
 
   if (mousePressed)
   {
-    if (sprayCan != null)
+    if (spray_manager != null)
     {
-      sprayCan.newKnot(mouseX, mouseY, weight);
+      spray_manager.newKnot(mouseX, mouseY, weight);
     }
   }
   
   paintscreen.beginDraw();
   paintscreen.strokeCap(SQUARE);
-  if (sprayCan != null)
+  if (spray_manager != null)
   {
-    sprayCan.draw(paintscreen);
+    spray_manager.draw(paintscreen);
   }
   paintscreen.endDraw();
   image(paintscreen, 0, 0);
@@ -65,7 +65,7 @@ void draw()
 
 void mousePressed()
 {
-  sprayCan.newStroke(mouseX, mouseY, weight);
+  spray_manager.newStroke(mouseX, mouseY, weight);
 }
 
 void keyPressed()
@@ -75,7 +75,7 @@ void keyPressed()
     paintscreen.beginDraw();
     paintscreen.image(wall, 0, 0);
     paintscreen.endDraw();
-    sprayCan.clearAll();
+    spray_manager.clearAll();
   }
   if (key == 's' || key == 'S')
   {
