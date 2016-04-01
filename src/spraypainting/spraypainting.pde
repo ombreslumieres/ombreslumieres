@@ -6,11 +6,12 @@ PShader global_point_shader;
 // Spray density distribution expressed in grayscale gradient
 PImage sprayMap;
 float weight;
-float depthOffset;
+float depth_offset;
 float offsetVel;
 PImage wall;
 PGraphics paintscreen;
 Path s;
+color col;
 
 void setup()
 {
@@ -21,36 +22,28 @@ void setup()
   wall = loadImage("background.png");
   spray_manager = new SprayManager();
   sprayMap = loadImage("sprayMap.png");
-  depthOffset = 0.0;
+  depth_offset = 0.0;
   offsetVel = 0.0005;
   global_point_shader = loadShader("pointfrag.glsl", "pointvert.glsl");  
   //global_point_shader.set("sharpness", 0.9);
   global_point_shader.set("sprayMap", sprayMap);
-  //background(0);
   paintscreen.beginDraw();
   paintscreen.image(wall, 0, 0);
   paintscreen.endDraw();
+  
+  col = color(#ffcc33);
+  weight = 100;
 }
 
 void draw()
 {
-  float animSpeed = 4;
-  float animate = (sin(radians(frameCount * animSpeed)) + 1.0) / 2.0; 
-  weight = animate * 100.0 + 100.0 + random(-10, 10);
-  colorMode(HSB);
-  float hue = animate * 50;
-  color col = color(hue, 255, 200);
-  colorMode(RGB);
   spray_manager.setColor(col);
   spray_manager.setWeight(weight);
   //println(weight);
 
   if (mousePressed)
   {
-    if (spray_manager != null)
-    {
-      spray_manager.newKnot(mouseX, mouseY, weight);
-    }
+    graffiti_add_knot_to_stroke(mouseX, mouseY, weight);
   }
   
   paintscreen.beginDraw();
@@ -63,22 +56,55 @@ void draw()
   image(paintscreen, 0, 0);
 }
 
+void graffiti_set_color(color new_color)
+{
+  col = new_color;
+}
+
+void graffiti_set_weight(float new_weight)
+{
+  weight = new_weight;
+}
+
+void graffiti_reset()
+{
+  paintscreen.beginDraw();
+  paintscreen.image(wall, 0, 0);
+  paintscreen.endDraw();
+  spray_manager.clearAll();
+}
+
+void graffiti_snapshot()
+{
+  saveFrame();
+}
+
+void graffiti_start_stroke(int x, int y, float the_weight)
+{
+  spray_manager.newStroke(x, y, the_weight);
+}
+
+void graffiti_add_knot_to_stroke(int x, int y, float the_weight)
+{
+  if (spray_manager != null)
+  {
+    spray_manager.newKnot(x, y, the_weight);
+  }
+}
+
 void mousePressed()
 {
-  spray_manager.newStroke(mouseX, mouseY, weight);
+  graffiti_start_stroke(mouseX, mouseY, weight);
 }
 
 void keyPressed()
 {
   if (key == 'r' || key == 'R')
   {
-    paintscreen.beginDraw();
-    paintscreen.image(wall, 0, 0);
-    paintscreen.endDraw();
-    spray_manager.clearAll();
+    graffiti_reset();
   }
   if (key == 's' || key == 'S')
   {
-    saveFrame(); 
+    graffiti_snapshot(); 
   }
 }

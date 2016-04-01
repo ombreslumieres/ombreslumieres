@@ -64,7 +64,7 @@ class Knot extends PVector
       // Draw in the buffer (if one was defined) or directly on the viewport
       if (targetBuffer != null)
       {
-        println("drawing");
+        // println("drawing");
         targetBuffer.strokeWeight(this.size);
         targetBuffer.stroke(this.col);
         targetBuffer.shader(global_point_shader, POINTS);
