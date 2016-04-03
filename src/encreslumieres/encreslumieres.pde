@@ -19,17 +19,21 @@ final String SYPHON_SERVER_NAME = "encres&lumieres";
 final boolean debug = false; // also draw a red stroke
 final int BLOB_INPUT_WIDTH = 640;
 final int BLOB_INPUT_HEIGHT = 480;
+final int FORCE_MAX = 1023; // no need to change this
+final int FORCE_THRESHOLD = 623; // you might need to change this
+final int BRUSH_MIN = 50;
+final int BRUSH_MAX = 150;
 
 SprayManager spray_manager;
 PShader global_point_shader; // See http://glsl.heroku.com/e#4633.5
 // Spray density distribution expressed in grayscale gradient
 PImage sprayMap;
-float weight;
+float brush_weight;
 float depth_offset;
 float offsetVel;
-PImage wall;
+PImage background_image;
 PGraphics paintscreen;
-Path s;
+//Path s;
 color spray_color;
 OscP5 osc_receiver;
 NetAddress osc_send_address;
@@ -58,7 +62,7 @@ void setup()
   // XXX comment out next line if not using Syphon
   //syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
   paintscreen = createGraphics(width, height, P3D);
-  wall = loadImage("background.png");
+  background_image = loadImage("background.png");
   spray_manager = new SprayManager();
   sprayMap = loadImage("sprayMap.png");
   depth_offset = 0.0;
@@ -67,11 +71,11 @@ void setup()
   //global_point_shader.set("sharpness", 0.9);
   global_point_shader.set("sprayMap", sprayMap);
   paintscreen.beginDraw();
-  paintscreen.image(wall, 0, 0);
+  paintscreen.image(background_image, 0, 0);
   paintscreen.endDraw();
   
   spray_color = color(#ffcc33);
-  weight = 100;
+  brush_weight = 100;
 }
 
 void draw()
@@ -84,6 +88,9 @@ void draw()
   // syphon_server.sendScreen();
 }
 
+/**
+ * Draw the graffiti strokes.
+ */
 void draw_graffiti()
 {
   paintscreen.beginDraw();
@@ -96,6 +103,9 @@ void draw_graffiti()
   image(paintscreen, 0, 0);
 }
 
+/**
+ * Draw the cursor.
+ */
 void draw_cursor()
 {
   stroke(100);
@@ -105,34 +115,52 @@ void draw_cursor()
   ellipse(blob_x, blob_y, 30.0, 30.0);
 }
 
+/**
+ * Sets the graffiti color.
+ */
 void graffiti_set_color(color new_color)
 {
   spray_color = new_color;
 }
 
+/**
+ * Sets the graffiti brush weight.
+ */
 void graffiti_set_weight(float new_weight)
 {
-  weight = new_weight;
+  brush_weight = new_weight;
 }
 
+/**
+ * Clears all the graffiti strokes.
+ */
 void graffiti_reset()
 {
   paintscreen.beginDraw();
-  paintscreen.image(wall, 0, 0);
+  paintscreen.image(background_image, 0, 0);
   paintscreen.endDraw();
   spray_manager.clearAll();
 }
 
+/**
+ * Take a snapshot.
+ */
 void graffiti_snapshot()
 {
   saveFrame();
 }
 
+/**
+ * Starts a graffiti stroke.
+ */
 void graffiti_start_stroke(int x, int y, float the_weight)
 {
   spray_manager.newStroke(x, y, the_weight);
 }
 
+/**
+ * Add a knot to the current graffiti stroke.
+ */
 void graffiti_add_knot_to_stroke(int x, int y, float the_weight)
 {
   if (spray_manager != null)
@@ -143,7 +171,7 @@ void graffiti_add_knot_to_stroke(int x, int y, float the_weight)
 
 void mousePressed()
 {
-  graffiti_start_stroke(mouseX, mouseY, weight);
+  graffiti_start_stroke(mouseX, mouseY, brush_weight);
 }
 
 void keyPressed()
@@ -158,16 +186,25 @@ void keyPressed()
   }
 }
 
+/**
+ * Handles /force OSC messages.
+ */
 void handle_force(String identifier, int force)
 {
   if (debug)
   {
     // println("/force " + identifier + " " + force);
   }
+  // Store the previous state
   force_was_pressed = force_is_pressed;
-  if (force < 400)
+  // Invert the number
+
+  force = FORCE_MAX - force;
+  if (force > FORCE_THRESHOLD)
   {
     force_is_pressed = true;
+    float new_weight = map_force(force);
+    graffiti_set_weight(new_weight);
   }
   else
   {
@@ -175,6 +212,9 @@ void handle_force(String identifier, int force)
   }
 }
 
+/**
+ * Handles /blob OSC messages.
+ */
 void handle_blob(String identifier, float x, float y, float size)
 {
   if (debug)
@@ -186,6 +226,9 @@ void handle_blob(String identifier, float x, float y, float size)
   blob_size = size; // unused
 }
 
+/**
+ * Handles /color OSC messages.
+ */
 void handle_color(String identifier, int r, int g, int b)
 {
   if (debug)
@@ -195,26 +238,48 @@ void handle_color(String identifier, int r, int g, int b)
   graffiti_set_color(color(r, g, b));
 }
 
+/**
+ * Convert a X coordinate from blob range to display range.
+ */
 float map_x(float value)
 {
   return map(value, 0.0, BLOB_INPUT_WIDTH, 0.0, VIDEO_OUTPUT_WIDTH);
 }
 
+/**
+ * Convert a Y coordinate from blob range to display range.
+ */
 float map_y(float value)
 {
   float height_3_4 = VIDEO_OUTPUT_WIDTH * (3.0 / 4.0);
   return map(value, 0.0, BLOB_INPUT_HEIGHT, 0.0, height_3_4);
 }
 
+/**
+ * Convert FSR force to brush size.
+ *
+ * TODO: we might want to use both blob size and FSR force to calculate
+ * brush size.
+ */
+float map_force(float value)
+{
+  float ret = map(value, FORCE_THRESHOLD, FORCE_MAX, 0.0, 1.0);
+  ret = map(ret, 0.0, 1.0, BRUSH_MIN, BRUSH_MAX);
+  return ret;
+}
+
+/**
+ * Does the job of creating the points in the stroke, if we received OSC messages.
+ */
 void create_points_if_needed()
 {
   spray_manager.setColor(spray_color);
-  spray_manager.setWeight(weight);
-  //println(weight);
+  spray_manager.setWeight(brush_weight);
+  //println(brush_weight);
 
   if (mousePressed)
   {
-    graffiti_add_knot_to_stroke(mouseX, mouseY, weight);
+    graffiti_add_knot_to_stroke(mouseX, mouseY, brush_weight);
   }
   
   if (! force_was_pressed && force_is_pressed)
@@ -239,9 +304,10 @@ void create_points_if_needed()
   }
 }
 
-
 /**
  * Incoming osc message are forwarded to the oscEvent method.
+ *
+ * The name of this method is set up by the oscP5 library.
  */
 void oscEvent(OscMessage message)
 {
