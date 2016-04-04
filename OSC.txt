@@ -1,33 +1,68 @@
 OSC message signatures for Encres & Lumieres
 ============================================
+Notes:
+* The spray identifier arguments are not used for now.
+* Use "default" for the default spray identifier.
+* Often, either float or int arguments are accepted. (but they must all be either float or int)
+
 
 blob
 ----
-/blob ,sfff
-/color ,siii
+Signatures:
+* /blob ,sfff
+* /blob ,siii
 
+Arguments:
 * Argument 1: spray identifier.
 * Argument 2: x [0-640]
 * Argument 3: y [0-480]
 * Argument 4: size [0-1000]
 
+Description:
+The blob is the position of the infrared LED as seen by the video camera. Its
+position moves around the brush.
+See the blobdetective software.
+
 
 force
 -----
-/force ,sf
-/color ,si
+Signatures:
+* /force ,sf
+* /force ,si
 
+Arguments:
 * Argument 1: spray identifier.
 * Argument 2: force [0-1023] - If it's < 400, it means it's pressed.
+
+Description:
+The force is used as an on/off controller for painting.
 
 
 color
 -----
-/color ,sfff
-/color ,siii
+Signatures:
+* /color ,sfff
+* /color ,siii
 
+Arguments:
 * Argument 1: spray identifier.
 * Argument 2: red [0-255]
 * Argument 3: green [0-255]
 * Argument 4: blue [0-255]
 
+Description:
+Sets the color of a brush.
+
+
+brush weight
+------------
+Signatures:
+* /brush/weight ,si
+* /brush/weight ,sf
+
+Arguments:
+* Argument 1: spray identifier.
+* Argument 2: brush weight. The default is 100. This will change the size of the brush.
+
+Description:
+Sets the weight of a brush.

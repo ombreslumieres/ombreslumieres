@@ -155,7 +155,14 @@ void graffiti_snapshot()
  */
 void graffiti_start_stroke(int x, int y, float the_weight)
 {
-  spray_manager.newStroke(x, y, the_weight);
+  if (spray_manager != null)
+  {
+    spray_manager.newStroke(x, y, the_weight);
+  }
+  else
+  {
+    println("Error: spray_manager is null!");
+  }
 }
 
 /**
@@ -166,6 +173,10 @@ void graffiti_add_knot_to_stroke(int x, int y, float the_weight)
   if (spray_manager != null)
   {
     spray_manager.newKnot(x, y, the_weight);
+  }
+  else
+  {
+    println("Error: spray_manager is null!");
   }
 }
 
@@ -203,8 +214,8 @@ void handle_force(String identifier, int force)
   if (force > FORCE_THRESHOLD)
   {
     force_is_pressed = true;
-    float new_weight = map_force(force);
-    graffiti_set_weight(new_weight);
+    // float new_weight = map_force(force);
+    // graffiti_set_weight(new_weight);
   }
   else
   {
@@ -224,6 +235,18 @@ void handle_blob(String identifier, float x, float y, float size)
   blob_x = map_x(x);
   blob_y = map_y(y);
   blob_size = size; // unused
+}
+
+/**
+ * Handles /brush/weight OSC messages.
+ */
+void handle_brush_weight(String identifier, int weight)
+{
+  if (debug)
+  {
+    // println("/brush/size " + identifier + " " + size);
+  }
+  brush_weight = weight;
 }
 
 /**
@@ -255,18 +278,18 @@ float map_y(float value)
   return map(value, 0.0, BLOB_INPUT_HEIGHT, 0.0, height_3_4);
 }
 
-/**
- * Convert FSR force to brush size.
- *
- * TODO: we might want to use both blob size and FSR force to calculate
- * brush size.
- */
-float map_force(float value)
-{
-  float ret = map(value, FORCE_THRESHOLD, FORCE_MAX, 0.0, 1.0);
-  ret = map(ret, 0.0, 1.0, BRUSH_MIN, BRUSH_MAX);
-  return ret;
-}
+// /**
+//  * Convert FSR force to brush size.
+//  *
+//  * TODO: we might want to use both blob size and FSR force to calculate
+//  * brush size.
+//  */
+// float map_force(float value)
+// {
+//   float ret = map(value, FORCE_THRESHOLD, FORCE_MAX, 0.0, 1.0);
+//   ret = map(ret, 0.0, 1.0, BRUSH_MIN, BRUSH_MAX);
+//   return ret;
+// }
 
 /**
  * Does the job of creating the points in the stroke, if we received OSC messages.
@@ -288,11 +311,13 @@ void create_points_if_needed()
     {
       println("begin");
     }
-    graffiti_start_stroke((int) blob_x, (int) blob_y, (int) blob_size);
+    // TODO: use blob_size and force to calculate brush_weight
+    graffiti_start_stroke((int) blob_x, (int) blob_y, (int) brush_weight);
   }
   else if (force_was_pressed && force_is_pressed)
   {
-    graffiti_add_knot_to_stroke((int) blob_x, (int) blob_y, (int) blob_size);
+    // TODO: use blob_size and force to calculate brush_weight
+    graffiti_add_knot_to_stroke((int) blob_x, (int) blob_y, (int) brush_weight);
   }
   else if (force_was_pressed && ! force_is_pressed)
   {
@@ -373,5 +398,22 @@ void oscEvent(OscMessage message)
       b = (int) message.get(3).floatValue();
     }
     handle_color(identifier, r, g, b);
+  }
+  else if (message.checkAddrPattern("/brush/weight"))
+  {
+    // TODO: parse string identifier as a first OSC argument
+    String identifier = "unknown";
+    int weight = 100;
+    if (message.checkTypetag("si"))
+    {
+      //identifier = message.get(0).StringValue();
+      weight = message.get(1).intValue();
+    }
+    else if (message.checkTypetag("sf"))
+    {
+      //identifier = message.get(0).StringValue();
+      weight = (int) message.get(1).floatValue();
+    }
+    handle_brush_weight(identifier, weight);
   }
 }
