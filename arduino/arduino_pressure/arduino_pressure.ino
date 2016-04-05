@@ -29,6 +29,7 @@ WiFiUDP Udp;
 IPAddress outIp(192, 168, 1, 6); // send to which IP
 const unsigned int outPort = 31340;
 const bool USE_BROADCAST = false; // if set to true will broadcast
+const bool RESEND_REPETITIVE_VALUES = true;
 
 void setup(void)
 { 
@@ -58,7 +59,7 @@ void loop()
         outIp[3] = 255;
     }
     valueSendi = analogRead(A0);
-    if (lastValue != valueSendi)
+    if (lastValue != valueSendi || RESEND_REPETITIVE_VALUES)
     {
         OSCMessage msg("/force");
         // TODO: add a string identifier as a 1st OSC argument
