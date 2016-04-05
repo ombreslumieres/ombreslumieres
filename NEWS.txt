@@ -1,9 +1,12 @@
 Encres & Lumieres release notes
 ===============================
 
-2016-??-?? - 0.2.0
+2016-04-05 - 0.2.0
 ------------------
-*
+* Can now draw in color with OSC
+* Use /brush/weight for the size of the brush.
+* Add colorpicker.pde - sends the OSC /color message
+* move blobdetector.pde to prototypes (since we now use blobdetector, a C++ app)
 
 2016-03-28 - 0.1.0
 ------------------
