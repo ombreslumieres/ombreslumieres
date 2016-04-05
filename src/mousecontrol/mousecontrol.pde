@@ -1,7 +1,7 @@
 /**
  * Sends OSC messages to our main sketch.
- * - Mouse around the mouse and press its first button
- * - Press keys 1,2,3,4,5,6 to change color.
+ * - Mouse around the mouse and press-drag its first button
+ * - Press keys 1,2,3,4,5,6,7,8,9,0 to change color.
  */
 
 import netP5.NetAddress;
@@ -21,6 +21,14 @@ final color COLOR_7 = #FFFFFF;
 final color COLOR_8 = #333333;
 final color COLOR_9 = #666666;
 final color COLOR_0 = #CCCCCC;
+final int MIN_BRUSH_WEIGHT = 40;
+final int MAX_BRUSH_WEIGHT = 200;
+final int BRUSH_WEIGHT_STEP = 10;
+final String DEFAULT_IDENTIFIER = "default";
+final boolean VERBOSE = false;
+// FIXME: if force < 400, it means it's pressed. Counter-intuitive, I know.
+final int FORCE_IF_PRESSED = 0;
+final int FORCE_IF_NOT_PRESSED = 1023;
 
 NetAddress osc_send_address;
 OscP5 osc_receiver;
@@ -28,6 +36,7 @@ boolean force_is_pressed = false;
 float blob_x = 0.0;
 float blob_y = 0.0;
 float blob_size = 100.0;
+int brush_weight = 100;
 
 void setup()
 {
@@ -47,7 +56,21 @@ void draw()
   
   send_force();
   send_blob();
+  send_brush_weight();
   draw_cursor();
+  draw_head_up_display();
+}
+
+void draw_head_up_display()
+{
+  fill(255, 255, 255);
+  textAlign(LEFT);
+  int x_pos = 10;
+  int force_value = (force_is_pressed ? FORCE_IF_PRESSED : FORCE_IF_NOT_PRESSED);
+  text("Send to osc.udp://" + OSC_SEND_HOST + ":" + OSC_SEND_PORT, x_pos, 20);
+  text("/blob " + DEFAULT_IDENTIFIER + " " + blob_x + " " + blob_y + " " + blob_size, x_pos, 40);
+  text("/brush/weight " + DEFAULT_IDENTIFIER + " " + brush_weight, x_pos, 60);
+  text("/force " + DEFAULT_IDENTIFIER + " " + force_value, x_pos, 80);
 }
 
 void mousePressed()
@@ -86,7 +109,40 @@ void keyPressed()
   {
     send_color(red(COLOR_6), green(COLOR_6), blue(COLOR_6));
   }
-  // TODO: 7,8,9,0
+  else if (key == '7')
+  {
+    send_color(red(COLOR_7), green(COLOR_7), blue(COLOR_7));
+  }
+  else if (key == '8')
+  {
+    send_color(red(COLOR_8), green(COLOR_8), blue(COLOR_8));
+  }
+  else if (key == '9')
+  {
+    send_color(red(COLOR_9), green(COLOR_9), blue(COLOR_9));
+  }
+  else if (key == '0')
+  {
+    send_color(red(COLOR_0), green(COLOR_0), blue(COLOR_0));
+  }
+  else if (keyCode == UP)
+  {
+    increase_brush_weight();
+  }
+  else if (keyCode == DOWN)
+  {
+    decrease_brush_weight();
+  }
+}
+
+void increase_brush_weight()
+{
+  brush_weight = min(MAX_BRUSH_WEIGHT, brush_weight + BRUSH_WEIGHT_STEP);
+}
+
+void decrease_brush_weight()
+{
+  brush_weight = max(MIN_BRUSH_WEIGHT, brush_weight - BRUSH_WEIGHT_STEP);
 }
 
 void draw_cursor()
@@ -108,35 +164,58 @@ void draw_cursor()
 void send_blob()
 {
   OscMessage message = new OscMessage("/blob");
-  message.add("default");
+  message.add(DEFAULT_IDENTIFIER);
   message.add(blob_x);
   message.add(blob_y);
   message.add(blob_size);
+  if (VERBOSE)
+  {
+    println("/color " + DEFAULT_IDENTIFIER + " " + blob_x + " " + blob_y + " " + blob_size);
+  }
   osc_receiver.send(message, osc_send_address);
 }
 
 void send_color(float r, float g, float b)
 {
   OscMessage message = new OscMessage("/color");
-  message.add("default");
+  message.add(DEFAULT_IDENTIFIER);
   message.add(r);
   message.add(g);
   message.add(b);
-  println("/color" + r + " " + g + " " + b);
+  if (VERBOSE)
+  {
+    println("/color " + DEFAULT_IDENTIFIER + " " + r + " " + g + " " + b);
+  }
+  osc_receiver.send(message, osc_send_address);
+}
+
+void send_brush_weight()
+{
+  OscMessage message = new OscMessage("/brush/weight");
+  message.add(DEFAULT_IDENTIFIER);
+  message.add(brush_weight);
+  if (VERBOSE)
+  {
+    println("/brush/weight " + DEFAULT_IDENTIFIER + " " + brush_weight);
+  }
   osc_receiver.send(message, osc_send_address);
 }
 
 void send_force()
 {
   OscMessage message = new OscMessage("/force");
-  message.add("default");
+  message.add(DEFAULT_IDENTIFIER);
   if (force_is_pressed)
   {
-    message.add(0); // FIXME: if force < 400, it means it's pressed. Counter-intuitive, I know.
+    message.add(FORCE_IF_PRESSED);
   }
   else
   {
-    message.add(1023);
+    message.add(FORCE_IF_NOT_PRESSED);
+  }
+  if (VERBOSE)
+  {
+    println("/force " + DEFAULT_IDENTIFIER + " " + "?");
   }
   osc_receiver.send(message, osc_send_address);
 }
