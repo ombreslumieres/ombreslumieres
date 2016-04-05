@@ -23,7 +23,7 @@ final int FORCE_MAX = 1023; // no need to change this
 final int FORCE_THRESHOLD = 623; // you might need to change this
 final int BRUSH_MIN = 50;
 final int BRUSH_MAX = 150;
-final String VERSION = "0.2.0";
+final String VERSION = "0.2.1";
 
 SprayManager spray_manager;
 PShader global_point_shader; // See http://glsl.heroku.com/e#4633.5
