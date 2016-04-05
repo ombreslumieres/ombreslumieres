@@ -2,18 +2,45 @@ Install blobdetective
 ---------------------
 See https://github.com/interferences-at/blobdetective
 
+Processing
+----------
+Download it from the web site.
+
+In the Sketch menu, choose manage libraries...
+
+Download and install the following libraries:
+
+* oscP5
+* Syphon
+* controlP5
+
+
 Ubuntu 15.10
 ------------
 Processing
 ~~~~~~~~~~
+Download it from the web site.
 
 
 GStreamer
 ~~~~~~~~~
-sudo apt-get install gstreamer0.10-plugins-good
+Needed for Processing to work correctly. Yes, they use the old
+GStreamer 0.10 version.::
+
+  sudo apt-get install gstreamer0.10-plugins-good
 
 Try a pipeline::
 
   ls -l /dev/video*
   gst-launch-0.10 v4l2src device=/dev/video1 ! ffmpegcolorspace ! video/x-raw-rgb, width=640, height=480, bpp=32, depth=24 ! ximagesink
 
+Arduino
+-------
+* Start the Arduino IDE and open the Preferences window.
+* Enter the following URL: http://arduino.esp8266.com/package_esp8266com_index.json 
+  into Additional Board Manager URLs field.
+* Open Boards Manager from Tools > Board menu and install the esp8266 platform.
+* Choose the Olimex MOD-WIFI-ESP8266(-DEV) board type
+* Download zip from https://github.com/ameisso/OSCLib-for-ESP8266 and unzip it
+  in ~/Documents/Arduino/librairies/ - or better, choose
+  Sketch > Include Library > Add .ZIP Library...
