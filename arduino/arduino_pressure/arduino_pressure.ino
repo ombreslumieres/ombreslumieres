@@ -9,11 +9,12 @@
  *   into Additional Board Manager URLs field.
  * - Open Boards Manager from Tools > Board menu and install the esp8266 platform.
  * - Choose the Olimex MOD-WIFI-ESP8266(-DEV) board type
- * - download zip from https://github.com/ameisso/OSCLib-for-ESP8266 and unzip it in ~/Documents/Arduino/librairies/
+ * - download zip from https://github.com/ameisso/OSCLib-for-ESP8266 and unzip it in ~/Documents/Arduino/librairies/ - or better,
+ *   choose Sketch > Include Library > Add .ZIP Library...
  */
 //#include <mem.h>
 #include <ESP8266WiFi.h>
-#include <WiFiUDP.h>
+#include <WiFiUdp.h> // Or <WiFiUDP.h> ?
 #include <OSCMessage.h>
 #include <OSCBundle.h>
     
