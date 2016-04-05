@@ -24,6 +24,7 @@ final int FORCE_THRESHOLD = 623; // you might need to change this
 final int BRUSH_MIN = 50;
 final int BRUSH_MAX = 150;
 final String VERSION = "0.2.1";
+final float BRUSH_SCALE = 0.3; // FIXME: ratio taken from Knot.pde (not quite right)
 
 SprayManager spray_manager;
 PShader global_point_shader; // See http://glsl.heroku.com/e#4633.5
@@ -114,7 +115,8 @@ void draw_cursor()
   noFill();
   strokeWeight(1.0);
   stroke(255, 0, 0);
-  ellipse(blob_x, blob_y, 30.0, 30.0);
+  float ellipse_size = brush_weight * BRUSH_SCALE;
+  ellipse(blob_x, blob_y, ellipse_size, ellipse_size);
 }
 
 /**

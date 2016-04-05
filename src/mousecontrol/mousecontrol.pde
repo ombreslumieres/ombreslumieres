@@ -29,6 +29,7 @@ final boolean VERBOSE = false;
 // FIXME: if force < 400, it means it's pressed. Counter-intuitive, I know.
 final int FORCE_IF_PRESSED = 0;
 final int FORCE_IF_NOT_PRESSED = 1023;
+final float BRUSH_SCALE = 0.3; // FIXME: ratio taken from Knot.pde (not quite right)
 
 NetAddress osc_send_address;
 OscP5 osc_receiver;
@@ -158,7 +159,8 @@ void draw_cursor()
   {
     stroke(#33ccff);
   }
-  ellipse(blob_x, blob_y, 30.0, 30.0);
+  float ellipse_size = brush_weight * BRUSH_SCALE;
+  ellipse(blob_x, blob_y, ellipse_size, ellipse_size);
 }
 
 void send_blob()
