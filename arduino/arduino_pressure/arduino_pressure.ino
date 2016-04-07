@@ -1,7 +1,9 @@
 /**
  * Reads a force sensor and broadcasts its value via OSC on a Wifi network.
  * This code is for the ESP8266 wifi device.
+ *
  * @author Louis-Robert Bouchard
+ * @author Alexandre Quessy
  * @date 2016-03-16
  * 
  * - Start the Arduino IDE and open the Preferences window.
@@ -14,22 +16,23 @@
  */
 //#include <mem.h>
 #include <ESP8266WiFi.h>
-#include <WiFiUdp.h> // Or <WiFiUDP.h> ?
+#include <WiFiUdp.h>
 #include <OSCMessage.h>
 #include <OSCBundle.h>
     
 // WiFi parameters
-long sendCount = 0;
-const char* ssid = "Dark Night";
-const char* password = "bitcoin12333";
-int valueSendi = 0;
-int lastValue = 0;
-boolean isUp = true;
+const char* WIFI_SSID = "XXX";
+const char* WIFI_PASSWORD = "XXX";
 
-WiFiUDP Udp;
-IPAddress outIp(192, 168, 1, 6); // send to which IP
-const unsigned int outPort = 31340;
-const bool USE_BROADCAST = false; // if set to true will broadcast
+// OSC settings
+IPAddress osc_send_host(192, 168, 1, 108);
+const unsigned int OSC_SEND_PORT = 31340;
+const bool USE_BROADCAST = true; // if set to true will broadcast
+
+// business logic data
+int last_force_value = 0;
+WiFiUDP wifi_udp;
+
 const bool RESEND_REPETITIVE_VALUES = true;
 
 void setup(void)
@@ -37,7 +40,7 @@ void setup(void)
     // Start Serial
     Serial.begin(115200);
     // Connect to WiFi
-    WiFi.begin(ssid, password);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(500);
@@ -56,20 +59,20 @@ void loop()
         // Broadcast IP is the same as our local IP,
         // but we replace the last number by 255
         // Example: 192.168.0.255
-        outIp = WiFi.localIP();
-        outIp[3] = 255;
+        osc_send_host = WiFi.localIP();
+        osc_send_host[3] = 255;
     }
-    valueSendi = analogRead(A0);
-    if (lastValue != valueSendi || RESEND_REPETITIVE_VALUES)
+    int force_value = analogRead(A0);
+    if (last_force_value != force_value || RESEND_REPETITIVE_VALUES)
     {
-        OSCMessage msg("/force");
+        OSCMessage osc_message("/force");
         // TODO: add a string identifier as a 1st OSC argument
-        msg.add(valueSendi);
-        Udp.beginPacket(outIp, outPort);
-        msg.send(Udp);
-        Udp.endPacket();
-        msg.empty();
+        osc_message.add(force_value);
+        wifi_udp.beginPacket(osc_send_host, OSC_SEND_PORT);
+        osc_message.send(wifi_udp);
+        wifi_udp.endPacket();
+        osc_message.empty();
    }
-   lastValue = valueSendi;
-   delay(30);  
+   last_force_value = force_value;
+   delay(30);
 }
