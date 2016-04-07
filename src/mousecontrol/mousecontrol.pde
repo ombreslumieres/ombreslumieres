@@ -24,7 +24,8 @@ final color COLOR_0 = #CCCCCC;
 final int MIN_BRUSH_WEIGHT = 40;
 final int MAX_BRUSH_WEIGHT = 200;
 final int BRUSH_WEIGHT_STEP = 10;
-final String DEFAULT_IDENTIFIER = "default";
+final int DEFAULT_IDENTIFIER = 0;
+int current_identifier = 0;
 final boolean VERBOSE = false;
 // FIXME: if force < 400, it means it's pressed. Counter-intuitive, I know.
 final int FORCE_IF_PRESSED = 0;
@@ -69,9 +70,9 @@ void draw_head_up_display()
   int x_pos = 10;
   int force_value = (force_is_pressed ? FORCE_IF_PRESSED : FORCE_IF_NOT_PRESSED);
   text("Send to osc.udp://" + OSC_SEND_HOST + ":" + OSC_SEND_PORT, x_pos, 20);
-  text("/blob " + DEFAULT_IDENTIFIER + " " + blob_x + " " + blob_y + " " + blob_size, x_pos, 40);
-  text("/brush/weight " + DEFAULT_IDENTIFIER + " " + brush_weight, x_pos, 60);
-  text("/force " + DEFAULT_IDENTIFIER + " " + force_value, x_pos, 80);
+  text("/blob " + current_identifier + " " + blob_x + " " + blob_y + " " + blob_size, x_pos, 40);
+  text("/brush/weight " + current_identifier + " " + brush_weight, x_pos, 60);
+  text("/force " + current_identifier + " " + force_value, x_pos, 80);
 }
 
 void mousePressed()
@@ -84,45 +85,90 @@ void mouseReleased()
   force_is_pressed = false;
 }
 
+void set_current_identifier(int value)
+{
+  current_identifier = value;
+}
+
 void keyPressed()
 {
-  if (key == '1')
+  if (key == '0')
   {
-    send_color(red(COLOR_1), green(COLOR_1), blue(COLOR_1));
+    set_current_identifier(0);
+  }
+  else if (key == '1')
+  {
+    set_current_identifier(1);
   }
   else if (key == '2')
   {
-    send_color(red(COLOR_2), green(COLOR_2), blue(COLOR_2));
+    set_current_identifier(2);
   }
   else if (key == '3')
   {
-    send_color(red(COLOR_3), green(COLOR_3), blue(COLOR_3));
+    set_current_identifier(3);
   }
   else if (key == '4')
   {
-    send_color(red(COLOR_4), green(COLOR_4), blue(COLOR_4));
+    set_current_identifier(4);
   }
   else if (key == '5')
   {
-    send_color(red(COLOR_5), green(COLOR_5), blue(COLOR_5));
+    set_current_identifier(5);
   }
   else if (key == '6')
   {
-    send_color(red(COLOR_6), green(COLOR_6), blue(COLOR_6));
+    set_current_identifier(6);
   }
   else if (key == '7')
   {
-    send_color(red(COLOR_7), green(COLOR_7), blue(COLOR_7));
+    set_current_identifier(7);
   }
   else if (key == '8')
   {
-    send_color(red(COLOR_8), green(COLOR_8), blue(COLOR_8));
+    set_current_identifier(8);
   }
   else if (key == '9')
   {
+    set_current_identifier(9);
+  }
+  else if (key == 'a')
+  {
+    send_color(red(COLOR_1), green(COLOR_1), blue(COLOR_1));
+  }
+  else if (key == 'b')
+  {
+    send_color(red(COLOR_2), green(COLOR_2), blue(COLOR_2));
+  }
+  else if (key == 'c')
+  {
+    send_color(red(COLOR_3), green(COLOR_3), blue(COLOR_3));
+  }
+  else if (key == 'd')
+  {
+    send_color(red(COLOR_4), green(COLOR_4), blue(COLOR_4));
+  }
+  else if (key == 'e')
+  {
+    send_color(red(COLOR_5), green(COLOR_5), blue(COLOR_5));
+  }
+  else if (key == 'f')
+  {
+    send_color(red(COLOR_6), green(COLOR_6), blue(COLOR_6));
+  }
+  else if (key == 'g')
+  {
+    send_color(red(COLOR_7), green(COLOR_7), blue(COLOR_7));
+  }
+  else if (key == 'h')
+  {
+    send_color(red(COLOR_8), green(COLOR_8), blue(COLOR_8));
+  }
+  else if (key == 'i')
+  {
     send_color(red(COLOR_9), green(COLOR_9), blue(COLOR_9));
   }
-  else if (key == '0')
+  else if (key == 'j')
   {
     send_color(red(COLOR_0), green(COLOR_0), blue(COLOR_0));
   }
@@ -166,13 +212,13 @@ void draw_cursor()
 void send_blob()
 {
   OscMessage message = new OscMessage("/blob");
-  message.add(DEFAULT_IDENTIFIER);
+  message.add(current_identifier);
   message.add(blob_x);
   message.add(blob_y);
   message.add(blob_size);
   if (VERBOSE)
   {
-    println("/color " + DEFAULT_IDENTIFIER + " " + blob_x + " " + blob_y + " " + blob_size);
+    println("/color " + current_identifier + " " + blob_x + " " + blob_y + " " + blob_size);
   }
   osc_receiver.send(message, osc_send_address);
 }
@@ -180,13 +226,13 @@ void send_blob()
 void send_color(float r, float g, float b)
 {
   OscMessage message = new OscMessage("/color");
-  message.add(DEFAULT_IDENTIFIER);
+  message.add(current_identifier);
   message.add(r);
   message.add(g);
   message.add(b);
   if (VERBOSE)
   {
-    println("/color " + DEFAULT_IDENTIFIER + " " + r + " " + g + " " + b);
+    println("/color " + current_identifier + " " + r + " " + g + " " + b);
   }
   osc_receiver.send(message, osc_send_address);
 }
@@ -194,11 +240,11 @@ void send_color(float r, float g, float b)
 void send_brush_weight()
 {
   OscMessage message = new OscMessage("/brush/weight");
-  message.add(DEFAULT_IDENTIFIER);
+  message.add(current_identifier);
   message.add(brush_weight);
   if (VERBOSE)
   {
-    println("/brush/weight " + DEFAULT_IDENTIFIER + " " + brush_weight);
+    println("/brush/weight " + current_identifier + " " + brush_weight);
   }
   osc_receiver.send(message, osc_send_address);
 }
@@ -206,7 +252,7 @@ void send_brush_weight()
 void send_force()
 {
   OscMessage message = new OscMessage("/force");
-  message.add(DEFAULT_IDENTIFIER);
+  message.add(current_identifier);
   if (force_is_pressed)
   {
     message.add(FORCE_IF_PRESSED);
@@ -217,7 +263,7 @@ void send_force()
   }
   if (VERBOSE)
   {
-    println("/force " + DEFAULT_IDENTIFIER + " " + "?");
+    println("/force " + current_identifier + " " + "?");
   }
   osc_receiver.send(message, osc_send_address);
 }

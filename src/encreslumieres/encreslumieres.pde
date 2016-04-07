@@ -114,9 +114,12 @@ void setup()
   paintscreen.endDraw();
 
   graffitis = new ArrayList<GraffitiInfo>();
-  graffitis.add(new GraffitiInfo());
-  graffitis.get(0).spray_color = color(#ffcc33);
-  graffitis.get(0).brush_weight = 100;
+  for (int i = 0; i < 10; i++)
+  {
+    graffitis.add(new GraffitiInfo());
+    graffitis.get(i).spray_color = color(#ffcc33);
+    graffitis.get(i).brush_weight = 100;
+  }
 }
 
 void draw()
