@@ -25,31 +25,70 @@ final int BRUSH_MIN = 50;
 final int BRUSH_MAX = 150;
 final String VERSION = "0.2.1";
 final float BRUSH_SCALE = 0.3; // FIXME: ratio taken from Knot.pde (not quite right)
+final int MOUSE_GRAFFITI_IDENTIFIER = 0;
 
-SprayCan spray_can;
+class GraffitiInfo
+{
+  public SprayCan spray_can;
+  public float brush_weight;
+  public float depth_offset;
+  public float offsetVel;
+  public color spray_color;
+  public int spray_x = 0;
+  public int spray_y = 0;
+  public boolean force_is_pressed = false;
+  public float blob_x = 0.0;
+  public float blob_y = 0.0;
+  public float blob_size = 0.0;
+  public boolean force_was_pressed = false;
+
+  GraffitiInfo()
+  {
+    this.spray_can = new SprayCan();
+  }
+  /**
+   * Starts a graffiti stroke.
+   */
+  void graffiti_start_stroke(int x, int y, float the_weight)
+  {
+    this.spray_can.newStroke(x, y, the_weight);
+  }
+  /**
+   * Sets the graffiti color.
+   */
+  void graffiti_set_color(color new_color)
+  {
+    this.spray_color = new_color;
+  }
+  /**
+   * Sets the graffiti brush weight.
+   */
+  void graffiti_set_weight(float new_weight)
+  {
+    this.brush_weight = new_weight;
+  }
+  /**
+   * Add a knot to the current graffiti stroke.
+   */
+  void graffiti_add_knot_to_stroke(int x, int y, float the_weight)
+  {
+    this.spray_can.newKnot(x, y, the_weight);
+  }
+}
+
 PShader point_shader; // See http://glsl.heroku.com/e#4633.5
 // Spray density distribution expressed in grayscale gradient
 PImage sprayMap;
-float brush_weight;
-float depth_offset;
-float offsetVel;
 PImage background_image;
 PGraphics paintscreen;
-//Path s;
-color spray_color;
 OscP5 osc_receiver;
 NetAddress osc_send_address;
 // XXX comment out next line if not using Syphon
 //SyphonServer syphon_server;
-int spray_x = 0;
-int spray_y = 0;
-boolean force_is_pressed = false;
-float blob_x = 0.0;
-float blob_y = 0.0;
-float blob_size = 0.0;
-boolean force_was_pressed = false;
+
 int VIDEO_OUTPUT_WIDTH;
 int VIDEO_OUTPUT_HEIGHT;
+ArrayList<GraffitiInfo> graffitis;
 
 void setup()
 {
@@ -66,27 +105,26 @@ void setup()
   //syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
   paintscreen = createGraphics(width, height, P3D);
   background_image = loadImage("background.png");
-  spray_can = new SprayCan();
   sprayMap = loadImage("sprayMap.png");
-  depth_offset = 0.0;
-  offsetVel = 0.0005;
   point_shader = loadShader("pointfrag.glsl", "pointvert.glsl");  
   //point_shader.set("sharpness", 0.9);
   point_shader.set("sprayMap", sprayMap);
   paintscreen.beginDraw();
   paintscreen.image(background_image, 0, 0);
   paintscreen.endDraw();
-  
-  spray_color = color(#ffcc33);
-  brush_weight = 100;
+
+  graffitis = new ArrayList<GraffitiInfo>();
+  graffitis.add(new GraffitiInfo());
+  graffitis.get(0).spray_color = color(#ffcc33);
+  graffitis.get(0).brush_weight = 100;
 }
 
 void draw()
 {
   background(0);
   create_points_if_needed();
-  draw_graffiti();
-  draw_cursor();
+  draw_graffitis();
+  draw_cursors();
   // XXX comment out next line if not using Syphon
   // syphon_server.sendScreen();
 }
@@ -94,13 +132,13 @@ void draw()
 /**
  * Draw the graffiti strokes.
  */
-void draw_graffiti()
+void draw_graffitis()
 {
   paintscreen.beginDraw();
   paintscreen.strokeCap(SQUARE);
-  if (spray_can != null)
+  for (int i = 0; i < graffitis.size(); i++)
   {
-    spray_can.draw(paintscreen, point_shader);
+    graffitis.get(i).spray_can.draw(paintscreen, point_shader);
   }
   paintscreen.endDraw();
   image(paintscreen, 0, 0);
@@ -109,30 +147,18 @@ void draw_graffiti()
 /**
  * Draw the cursor.
  */
-void draw_cursor()
+void draw_cursors()
 {
   stroke(100);
   noFill();
   strokeWeight(1.0);
   stroke(255, 0, 0);
-  float ellipse_size = brush_weight * BRUSH_SCALE;
-  ellipse(blob_x, blob_y, ellipse_size, ellipse_size);
-}
-
-/**
- * Sets the graffiti color.
- */
-void graffiti_set_color(color new_color)
-{
-  spray_color = new_color;
-}
-
-/**
- * Sets the graffiti brush weight.
- */
-void graffiti_set_weight(float new_weight)
-{
-  brush_weight = new_weight;
+  for (int i = 0; i < graffitis.size(); i++)
+  {
+    GraffitiInfo info = graffitis.get(i);
+    float ellipse_size = info.brush_weight * BRUSH_SCALE;
+    ellipse(info.blob_x, info.blob_y, ellipse_size, ellipse_size);
+  }
 }
 
 /**
@@ -143,7 +169,11 @@ void graffiti_reset()
   paintscreen.beginDraw();
   paintscreen.image(background_image, 0, 0);
   paintscreen.endDraw();
-  spray_can.clearAll();
+
+  for (int i = 0; i < graffitis.size(); i++)
+  {
+    graffitis.get(i).spray_can.clearAll();
+  }
 }
 
 /**
@@ -154,39 +184,9 @@ void graffiti_snapshot()
   saveFrame();
 }
 
-/**
- * Starts a graffiti stroke.
- */
-void graffiti_start_stroke(int x, int y, float the_weight)
-{
-  if (spray_can != null)
-  {
-    spray_can.newStroke(x, y, the_weight);
-  }
-  else
-  {
-    println("Error: spray_can is null!");
-  }
-}
-
-/**
- * Add a knot to the current graffiti stroke.
- */
-void graffiti_add_knot_to_stroke(int x, int y, float the_weight)
-{
-  if (spray_can != null)
-  {
-    spray_can.newKnot(x, y, the_weight);
-  }
-  else
-  {
-    println("Error: spray_can is null!");
-  }
-}
-
 void mousePressed()
 {
-  graffiti_start_stroke(mouseX, mouseY, brush_weight);
+  graffitis.get(MOUSE_GRAFFITI_IDENTIFIER).graffiti_start_stroke(mouseX, mouseY, graffitis.get(MOUSE_GRAFFITI_IDENTIFIER).brush_weight);
 }
 
 void keyPressed()
@@ -197,72 +197,106 @@ void keyPressed()
   }
   if (key == 's' || key == 'S')
   {
-    graffiti_snapshot(); 
+    graffiti_snapshot();
+  }
+}
+
+boolean graffiti_has_index(int index)
+{
+  if (index >= graffitis.size() || index < 0)
+  {
+    return false;
+  } else
+  {
+    return true;
   }
 }
 
 /**
  * Handles /force OSC messages.
  */
-void handle_force(String identifier, int force)
+void handle_force(int identifier, int force)
 {
+  if (! graffiti_has_index(identifier))
+  {
+    println("No such index " + identifier);
+    return;
+  }
+  GraffitiInfo graffiti = graffitis.get(identifier);
   if (debug)
   {
     // println("/force " + identifier + " " + force);
   }
   // Store the previous state
-  force_was_pressed = force_is_pressed;
+  graffiti.force_was_pressed = graffiti.force_is_pressed;
   // Invert the number
 
   force = FORCE_MAX - force;
   if (force > FORCE_THRESHOLD)
   {
-    force_is_pressed = true;
+    graffiti.force_is_pressed = true;
     // float new_weight = map_force(force);
     // graffiti_set_weight(new_weight);
-  }
-  else
+  } else
   {
-    force_is_pressed = false;
+    graffiti.force_is_pressed = false;
   }
 }
 
 /**
  * Handles /blob OSC messages.
  */
-void handle_blob(String identifier, float x, float y, float size)
+void handle_blob(int identifier, float x, float y, float size)
 {
+  if (! graffiti_has_index(identifier))
+  {
+    println("No such index " + identifier);
+    return;
+  }
+  GraffitiInfo graffiti = graffitis.get(identifier);
   if (debug)
   {
     // println("/blob " + x + ", " + y + " size=" + size);
   }
-  blob_x = map_x(x);
-  blob_y = map_y(y);
-  blob_size = size; // unused
+  graffiti.blob_x = map_x(x);
+  graffiti.blob_y = map_y(y);
+  graffiti.blob_size = size; // unused
 }
 
 /**
  * Handles /brush/weight OSC messages.
  */
-void handle_brush_weight(String identifier, int weight)
+void handle_brush_weight(int identifier, int weight)
 {
+  if (! graffiti_has_index(identifier))
+  {
+    println("No such index " + identifier);
+    return;
+  }
+  GraffitiInfo graffiti = graffitis.get(identifier);
   if (debug)
   {
     // println("/brush/size " + identifier + " " + size);
   }
-  brush_weight = weight;
+  graffiti.brush_weight = weight;
 }
 
 /**
  * Handles /color OSC messages.
  */
-void handle_color(String identifier, int r, int g, int b)
+void handle_color(int identifier, int r, int g, int b)
 {
+  if (! graffiti_has_index(identifier))
+  {
+    println("No such index " + identifier);
+    return;
+  }
+  GraffitiInfo graffiti = graffitis.get(identifier);
   if (debug)
   {
     println("/color " + r + ", " + g + ", " + b);
   }
-  graffiti_set_color(color(r, g, b));
+  graffiti.graffiti_set_color(color(r, g, b));
 }
 
 /**
@@ -300,36 +334,43 @@ float map_y(float value)
  */
 void create_points_if_needed()
 {
-  spray_can.setColor(spray_color);
-  spray_can.setWeight(brush_weight);
+  for (int i = 0; i < graffitis.size(); i++)
+  {
+    GraffitiInfo graffiti = graffitis.get(i);
+    graffiti.spray_can.setColor(graffiti.spray_color);
+    graffiti.spray_can.setWeight(graffiti.brush_weight);
+  }
+
   //println(brush_weight);
 
   if (mousePressed)
   {
-    graffiti_add_knot_to_stroke(mouseX, mouseY, brush_weight);
+    GraffitiInfo graffiti = graffitis.get(MOUSE_GRAFFITI_IDENTIFIER);
+    graffiti.graffiti_add_knot_to_stroke(mouseX, mouseY, graffiti.brush_weight);
   }
-  
-  if (! force_was_pressed && force_is_pressed)
+  for (int i = 0; i < graffitis.size(); i++)
   {
-    if (debug)
+    GraffitiInfo graffiti = graffitis.get(i);
+    if (! graffiti.force_was_pressed && graffiti.force_is_pressed)
     {
-      println("begin");
-    }
-    // TODO: use blob_size and force to calculate brush_weight
-    graffiti_start_stroke((int) blob_x, (int) blob_y, (int) brush_weight);
-  }
-  else if (force_was_pressed && force_is_pressed)
-  {
-    // TODO: use blob_size and force to calculate brush_weight
-    graffiti_add_knot_to_stroke((int) blob_x, (int) blob_y, (int) brush_weight);
-  }
-  else if (force_was_pressed && ! force_is_pressed)
-  {
-    if (debug)
+      if (debug)
+      {
+        println("begin");
+      }
+      // TODO: use blob_size and force to calculate brush_weight
+      graffiti.graffiti_start_stroke((int) graffiti.blob_x, (int) graffiti.blob_y, (int) graffiti.brush_weight);
+    } else if (graffiti.force_was_pressed && graffiti.force_is_pressed)
     {
-      println("end");
+      // TODO: use blob_size and force to calculate brush_weight
+      graffiti.graffiti_add_knot_to_stroke((int) graffiti.blob_x, (int) graffiti.blob_y, (int) graffiti.brush_weight);
+    } else if (graffiti.force_was_pressed && ! graffiti.force_is_pressed)
+    {
+      if (debug)
+      {
+        println("end");
+      }
+      // spray_end();
     }
-    // spray_end();
   }
 }
 
@@ -340,18 +381,20 @@ void create_points_if_needed()
  */
 void oscEvent(OscMessage message)
 {
+  int identifier = 0;
   //print("Received " + message.addrPattern() + " " + message.typetag() + "\n");
   if (message.checkAddrPattern("/force"))
   {
     // TODO: parse string identifier as a first OSC argument
-    String identifier = "unknown";
     int force = 0;
-    if (message.checkTypetag("si"))
+    if (message.checkTypetag("ii"))
     {
+      identifier = message.get(0).intValue();
       force = message.get(1).intValue();
     }
-    else if (message.checkTypetag("sf"))
+    else if (message.checkTypetag("if"))
     {
+      identifier = message.get(0).intValue();
       force = (int) message.get(1).floatValue();
     }
     else if (message.checkTypetag("i")) // FIXME: remove this legacy signature
@@ -366,14 +409,12 @@ void oscEvent(OscMessage message)
   }
   else if (message.checkAddrPattern("/blob"))
   {
-    // TODO: parse string identifier as a first OSC argument
-    String identifier = "unknown";
     float x = 0.0;
     float y = 0.0;
     float size = 0.0;
-    if (message.checkTypetag("sfff"))
+    if (message.checkTypetag("ifff"))
     {
-      //identifier = message.get(0).StringValue();
+      identifier = message.get(0).intValue();
       x = message.get(1).floatValue();
       y = message.get(2).floatValue();
       size = message.get(3).floatValue();
@@ -382,21 +423,18 @@ void oscEvent(OscMessage message)
   }
   else if (message.checkAddrPattern("/color"))
   {
-    // TODO: parse string identifier as a first OSC argument
-    String identifier = "unknown";
     int r = 255;
     int g = 255;
     int b = 255;
-    if (message.checkTypetag("siii"))
+    if (message.checkTypetag("iiii"))
     {
-      //identifier = message.get(0).StringValue();
+      identifier = message.get(0).intValue();
       r = message.get(1).intValue();
       g = message.get(2).intValue();
       b = message.get(3).intValue();
-    }
-    else if (message.checkTypetag("sfff"))
+    } else if (message.checkTypetag("ifff"))
     {
-      //identifier = message.get(0).StringValue();
+      identifier = message.get(0).intValue();
       r = (int) message.get(1).floatValue();
       g = (int) message.get(2).floatValue();
       b = (int) message.get(3).floatValue();
@@ -405,17 +443,14 @@ void oscEvent(OscMessage message)
   }
   else if (message.checkAddrPattern("/brush/weight"))
   {
-    // TODO: parse string identifier as a first OSC argument
-    String identifier = "unknown";
     int weight = 100;
-    if (message.checkTypetag("si"))
+    if (message.checkTypetag("ii"))
     {
-      //identifier = message.get(0).StringValue();
+      identifier = message.get(0).intValue();
       weight = message.get(1).intValue();
-    }
-    else if (message.checkTypetag("sf"))
+    } else if (message.checkTypetag("if"))
     {
-      //identifier = message.get(0).StringValue();
+      identifier = message.get(0).intValue();
       weight = (int) message.get(1).floatValue();
     }
     handle_brush_weight(identifier, weight);
