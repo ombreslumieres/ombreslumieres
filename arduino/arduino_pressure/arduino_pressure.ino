@@ -21,18 +21,18 @@
 #include <OSCBundle.h>
     
 // WiFi parameters
-const char* WIFI_SSID = "XXX";
-const char* WIFI_PASSWORD = "XXX";
+const char* WIFI_SSID = "blues";
+const char* WIFI_PASSWORD = "10002000300040005000600070";
 
 // OSC settings
 IPAddress osc_send_host(192, 168, 1, 108);
 const unsigned int OSC_SEND_PORT = 31340;
 const bool USE_BROADCAST = true; // if set to true will broadcast
+const int SPRAY_IDENTIFIER = 0;
 
 // business logic data
 int last_force_value = 0;
 WiFiUDP wifi_udp;
-
 const bool RESEND_REPETITIVE_VALUES = true;
 
 void setup(void)
@@ -66,7 +66,7 @@ void loop()
     if (last_force_value != force_value || RESEND_REPETITIVE_VALUES)
     {
         OSCMessage osc_message("/force");
-        // TODO: add a string identifier as a 1st OSC argument
+        osc_message.add(SPRAY_IDENTIFIER);
         osc_message.add(force_value);
         wifi_udp.beginPacket(osc_send_host, OSC_SEND_PORT);
         osc_message.send(wifi_udp);
