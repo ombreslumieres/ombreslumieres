@@ -1,3 +1,8 @@
+/**
+ * One knot in a path.
+ * 
+ * FIXME: accesses the global_point_shader varible.
+ */
 class Knot extends PVector
 {  
   float size;
@@ -5,7 +10,7 @@ class Knot extends PVector
   float angle;  
   float noiseDepth; // for spray pattern generation
   float timestamp;  // for replay
-  PGraphics targetBuffer;
+  //PGraphics targetBuffer;
   boolean isDrawn = false;
   
   Knot(float x, float y, float weight, color tint)
@@ -20,7 +25,7 @@ class Knot extends PVector
   
   PVector getPos()
   {
-    return new PVector(x,y);
+    return new PVector(x, y);
   }
   
   float getSize()
@@ -33,20 +38,10 @@ class Knot extends PVector
     return this.col;
   }
   
-  void setBuffer(PGraphics target)
-  {
-    this.targetBuffer = target;
-  }
-  
-  PGraphics getBuffer()
-  {
-    return this.targetBuffer; 
-  }
-  
   /**
-   * FIXME: accesses the global variable global_point_shader.
+   * @param shader: Our point shader.
    */
-  void draw(PGraphics targetBuffer)
+  void draw(PGraphics targetBuffer, PShader shader)
   {
     float x = this.x;
     float y = this.y;
@@ -54,23 +49,19 @@ class Knot extends PVector
     dir.normalize();
     if (! isDrawn)
     {
-      global_point_shader.set("weight", this.size);
-      global_point_shader.set("direction", dir.x, dir.y);
-      global_point_shader.set("rotation", random(0.0, 1.0), random(0.0, 1.0));
-      global_point_shader.set("scale", 0.3); 
-      global_point_shader.set("soften", 1.0); // towards 0.0 for harder brush, towards 2.0 for lighter brush
-      global_point_shader.set("depthOffset", this.noiseDepth);
+      shader.set("weight", this.size);
+      shader.set("direction", dir.x, dir.y);
+      shader.set("rotation", random(0.0, 1.0), random(0.0, 1.0));
+      shader.set("scale", 0.3); 
+      shader.set("soften", 1.0); // towards 0.0 for harder brush, towards 2.0 for lighter brush
+      shader.set("depthOffset", this.noiseDepth);
       
-      // Draw in the buffer (if one was defined) or directly on the viewport
-      if (targetBuffer != null)
-      {
-        // println("drawing");
-        targetBuffer.strokeWeight(this.size);
-        targetBuffer.stroke(this.col);
-        targetBuffer.shader(global_point_shader, POINTS);
-        targetBuffer.point(x, y); 
-      }
-      //else point(x,y);
+      // println("drawing");
+      targetBuffer.strokeWeight(this.size);
+      targetBuffer.stroke(this.col);
+      targetBuffer.shader(shader, POINTS);
+      targetBuffer.point(x, y); 
+      
       //targetBuffer.resetShader();
       isDrawn = true;
     }

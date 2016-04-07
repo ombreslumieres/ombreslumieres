@@ -17,11 +17,11 @@ class SprayManager
   * Draws all its strokes.
   * NOTE: points are only drawn once so you should not redraw the background
   */
- void draw(PGraphics buffer)
+ void draw(PGraphics buffer, PShader shader)
  {
-   for(Path p: strokeList)
+   for (Path p: this.strokeList)
    {
-     p.draw(buffer);
+     p.draw(buffer, shader);
    }
  }
  
@@ -30,11 +30,11 @@ class SprayManager
   */
  void clearAll()
  {
-   for(Path p: strokeList)
+   for (Path p: this.strokeList)
    {
      p.clear();
    }
-   strokeList.clear();
+   this.strokeList.clear();
  }
  
  /**
@@ -44,7 +44,7 @@ class SprayManager
  {  
    Knot startingKnot = new Knot(x, y, weight, col);
    Path p = new Path(startingKnot);
-   strokeList.add(p); 
+   this.strokeList.add(p); 
  }
  
  /**
@@ -53,7 +53,7 @@ class SprayManager
  void newKnot(float x, float y, float weight)
  {
    Knot newKnot = new Knot(x, y, weight, col);
-   Path activePath = getActivePath();
+   Path activePath = this.getActivePath();
    activePath.add(newKnot);
  }
  
@@ -62,7 +62,7 @@ class SprayManager
   */
  Path getActivePath()
  {
-   return strokeList.get(strokeList.size() - 1);
+   return this.strokeList.get(this.strokeList.size() - 1);
  }
  
  /**
@@ -70,7 +70,7 @@ class SprayManager
   */
  void setWeight(float weight)
  {
-   size = weight;
+   this.size = weight;
  }
  
  /**
@@ -78,7 +78,7 @@ class SprayManager
   */
  void setColor(color tint)
  {
-   col = tint;
+   this.col = tint;
  }
  
  color getColor()

@@ -1,10 +1,8 @@
-
 /**
- * Each stroke/path contains a list of points.
+ * Each stroke/path contains a list of points/knots.
  */
 class Path
 {
-  PGraphics targetBuffer;
   ArrayList<Knot> pointList; // raw point list
   Knot previousKnot;
   Knot currentKnot;
@@ -15,6 +13,7 @@ class Path
   
   Path()
   {
+    // nothing to do
   }
 
   Path(Knot startingPoint)
@@ -28,20 +27,11 @@ class Path
     this.add(startingPoint);
   }
   
-  void setBuffer(PGraphics target)
-  {
-    this.targetBuffer = target;
-  }
-  
   /**
    * TODO: rename this method.
    */
   void add(Knot k)
-  {  
-    if (this.targetBuffer != null)
-    {
-      k.setBuffer(this.targetBuffer);
-    }
+  {
     if (this.pointList == null)
     {
       this.createList(k);
@@ -108,11 +98,11 @@ class Path
     }
   }
   
-  void draw(PGraphics buffer)
+  void draw(PGraphics buffer, PShader shader)
   {
     for (Knot p: this.pointList)
     {
-      p.draw(buffer);
+      p.draw(buffer, shader);
     }
   }
   

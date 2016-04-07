@@ -27,7 +27,7 @@ final String VERSION = "0.2.1";
 final float BRUSH_SCALE = 0.3; // FIXME: ratio taken from Knot.pde (not quite right)
 
 SprayManager spray_manager;
-PShader global_point_shader; // See http://glsl.heroku.com/e#4633.5
+PShader point_shader; // See http://glsl.heroku.com/e#4633.5
 // Spray density distribution expressed in grayscale gradient
 PImage sprayMap;
 float brush_weight;
@@ -70,9 +70,9 @@ void setup()
   sprayMap = loadImage("sprayMap.png");
   depth_offset = 0.0;
   offsetVel = 0.0005;
-  global_point_shader = loadShader("pointfrag.glsl", "pointvert.glsl");  
-  //global_point_shader.set("sharpness", 0.9);
-  global_point_shader.set("sprayMap", sprayMap);
+  point_shader = loadShader("pointfrag.glsl", "pointvert.glsl");  
+  //point_shader.set("sharpness", 0.9);
+  point_shader.set("sprayMap", sprayMap);
   paintscreen.beginDraw();
   paintscreen.image(background_image, 0, 0);
   paintscreen.endDraw();
@@ -100,7 +100,7 @@ void draw_graffiti()
   paintscreen.strokeCap(SQUARE);
   if (spray_manager != null)
   {
-    spray_manager.draw(paintscreen);
+    spray_manager.draw(paintscreen, point_shader);
   }
   paintscreen.endDraw();
   image(paintscreen, 0, 0);
