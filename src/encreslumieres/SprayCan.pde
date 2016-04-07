@@ -1,13 +1,13 @@
 /**
- * Manages one spray painter.
+ * Manages one spray can.
  */
-class SprayManager
+class SprayCan
 { 
  ArrayList<Path> strokeList;
  color col;
  float size;
  
- SprayManager()
+ SprayCan()
  {
    strokeList = new ArrayList<Path>();
    col = color(0);

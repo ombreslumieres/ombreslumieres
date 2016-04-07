@@ -26,7 +26,7 @@ final int BRUSH_MAX = 150;
 final String VERSION = "0.2.1";
 final float BRUSH_SCALE = 0.3; // FIXME: ratio taken from Knot.pde (not quite right)
 
-SprayManager spray_manager;
+SprayCan spray_can;
 PShader point_shader; // See http://glsl.heroku.com/e#4633.5
 // Spray density distribution expressed in grayscale gradient
 PImage sprayMap;
@@ -66,7 +66,7 @@ void setup()
   //syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
   paintscreen = createGraphics(width, height, P3D);
   background_image = loadImage("background.png");
-  spray_manager = new SprayManager();
+  spray_can = new SprayCan();
   sprayMap = loadImage("sprayMap.png");
   depth_offset = 0.0;
   offsetVel = 0.0005;
@@ -98,9 +98,9 @@ void draw_graffiti()
 {
   paintscreen.beginDraw();
   paintscreen.strokeCap(SQUARE);
-  if (spray_manager != null)
+  if (spray_can != null)
   {
-    spray_manager.draw(paintscreen, point_shader);
+    spray_can.draw(paintscreen, point_shader);
   }
   paintscreen.endDraw();
   image(paintscreen, 0, 0);
@@ -143,7 +143,7 @@ void graffiti_reset()
   paintscreen.beginDraw();
   paintscreen.image(background_image, 0, 0);
   paintscreen.endDraw();
-  spray_manager.clearAll();
+  spray_can.clearAll();
 }
 
 /**
@@ -159,13 +159,13 @@ void graffiti_snapshot()
  */
 void graffiti_start_stroke(int x, int y, float the_weight)
 {
-  if (spray_manager != null)
+  if (spray_can != null)
   {
-    spray_manager.newStroke(x, y, the_weight);
+    spray_can.newStroke(x, y, the_weight);
   }
   else
   {
-    println("Error: spray_manager is null!");
+    println("Error: spray_can is null!");
   }
 }
 
@@ -174,13 +174,13 @@ void graffiti_start_stroke(int x, int y, float the_weight)
  */
 void graffiti_add_knot_to_stroke(int x, int y, float the_weight)
 {
-  if (spray_manager != null)
+  if (spray_can != null)
   {
-    spray_manager.newKnot(x, y, the_weight);
+    spray_can.newKnot(x, y, the_weight);
   }
   else
   {
-    println("Error: spray_manager is null!");
+    println("Error: spray_can is null!");
   }
 }
 
@@ -300,8 +300,8 @@ float map_y(float value)
  */
 void create_points_if_needed()
 {
-  spray_manager.setColor(spray_color);
-  spray_manager.setWeight(brush_weight);
+  spray_can.setColor(spray_color);
+  spray_can.setWeight(brush_weight);
   //println(brush_weight);
 
   if (mousePressed)
