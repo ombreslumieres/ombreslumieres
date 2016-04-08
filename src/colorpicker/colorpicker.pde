@@ -19,6 +19,7 @@ ControlP5 control_p5;
 ColorPicker color_picker;
 NetAddress osc_send_address;
 OscP5 osc_receiver;
+int current_identifier = 0; // TODO: allow to change this
 
 void setup()
 {
@@ -81,7 +82,7 @@ void keyPressed()
 void send_color(float r, float g, float b)
 {
   OscMessage message = new OscMessage("/color");
-  message.add("default");
+  message.add(current_identifier);
   message.add(r);
   message.add(g);
   message.add(b);
