@@ -21,8 +21,8 @@
 #include <OSCBundle.h>
     
 // WiFi parameters
-const char* WIFI_SSID = "blues";
-const char* WIFI_PASSWORD = "10002000300040005000600070";
+const char* WIFI_SSID = "xxx";
+const char* WIFI_PASSWORD = "xxx";
 
 // OSC settings
 IPAddress osc_send_host(192, 168, 1, 108);
