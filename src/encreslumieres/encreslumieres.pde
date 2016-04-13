@@ -437,7 +437,8 @@ void oscEvent(OscMessage message)
       r = message.get(1).intValue();
       g = message.get(2).intValue();
       b = message.get(3).intValue();
-    } else if (message.checkTypetag("ifff"))
+    }
+    else if (message.checkTypetag("ifff"))
     {
       identifier = message.get(0).intValue();
       r = (int) message.get(1).floatValue();
@@ -453,7 +454,8 @@ void oscEvent(OscMessage message)
     {
       identifier = message.get(0).intValue();
       weight = message.get(1).intValue();
-    } else if (message.checkTypetag("if"))
+    }
+    else if (message.checkTypetag("if"))
     {
       identifier = message.get(0).intValue();
       weight = (int) message.get(1).floatValue();
