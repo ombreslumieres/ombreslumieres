@@ -362,11 +362,13 @@ void create_points_if_needed()
       }
       // TODO: use blob_size and force to calculate brush_weight
       graffiti.graffiti_start_stroke((int) graffiti.blob_x, (int) graffiti.blob_y, (int) graffiti.brush_weight);
-    } else if (graffiti.force_was_pressed && graffiti.force_is_pressed)
+    }
+    else if (graffiti.force_was_pressed && graffiti.force_is_pressed)
     {
       // TODO: use blob_size and force to calculate brush_weight
       graffiti.graffiti_add_knot_to_stroke((int) graffiti.blob_x, (int) graffiti.blob_y, (int) graffiti.brush_weight);
-    } else if (graffiti.force_was_pressed && ! graffiti.force_is_pressed)
+    }
+    else if (graffiti.force_was_pressed && ! graffiti.force_is_pressed)
     {
       if (debug)
       {

@@ -3,13 +3,13 @@
  */
 class SprayCan
 { 
- ArrayList<Path> strokeList;
- color col;
- float size;
+ private ArrayList<Path> paths;
+ private color col;
+ private float size;
  
- SprayCan()
+ public SprayCan()
  {
-   strokeList = new ArrayList<Path>();
+   paths = new ArrayList<Path>();
    col = color(0);
  }
  
@@ -17,9 +17,9 @@ class SprayCan
   * Draws all its strokes.
   * NOTE: points are only drawn once so you should not redraw the background
   */
- void draw(PGraphics buffer, PShader shader)
+ public void draw(PGraphics buffer, PShader shader)
  {
-   for (Path p: this.strokeList)
+   for (Path p: this.paths)
    {
      p.draw(buffer, shader);
    }
@@ -28,47 +28,62 @@ class SprayCan
  /*
   * Deletes all the strokes.
   */
- void clearAll()
+ public void clearAll()
  {
-   for (Path p: this.strokeList)
+   for (Path p: this.paths)
    {
      p.clear();
    }
-   this.strokeList.clear();
+   this.paths.clear();
  }
  
  /**
   * Starts a stroke.
   */
- void newStroke(float x, float y, float weight)
+ public void newStroke(float x, float y, float weight)
  {  
    Knot startingKnot = new Knot(x, y, weight, col);
    Path p = new Path(startingKnot);
-   this.strokeList.add(p); 
+   this.paths.add(p); 
  }
  
  /**
   * Adds a point the the current stroke.
   */
- void newKnot(float x, float y, float weight)
+ public void newKnot(float x, float y, float weight)
  {
    Knot newKnot = new Knot(x, y, weight, col);
    Path activePath = this.getActivePath();
-   activePath.add(newKnot);
+   if (activePath == null)
+   {
+     this.newStroke(x, y, weight);
+     return;
+   }
+   else
+   {
+     activePath.add(newKnot);
+   }
  }
  
  /**
   * Return the stroke beeing drawn at the moment.
   */
- Path getActivePath()
+ private Path getActivePath()
  {
-   return this.strokeList.get(this.strokeList.size() - 1);
+   if (this.paths.size() == 0)
+   {
+     return null;
+   }
+   else
+   {
+     return this.paths.get(this.paths.size() - 1);
+   }
  }
  
  /**
   * Sets the size of the spray.
   */
- void setWeight(float weight)
+ public void setWeight(float weight)
  {
    this.size = weight;
  }
@@ -76,12 +91,12 @@ class SprayCan
  /**
   * Sets the color of the spray.
   */
- void setColor(color tint)
+ public void setColor(color tint)
  {
    this.col = tint;
  }
  
- color getColor()
+ public color getColor()
  {
    return col;
  }
