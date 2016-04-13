@@ -3,25 +3,25 @@
  */
 class Path
 {
-  ArrayList<Knot> pointList; // raw point list
-  Knot previousKnot;
-  Knot currentKnot;
-  float mag;
-  float numSteps;
-  float distMin = 0;
-  float stepSize = 1;
+  private ArrayList<Knot> knots; // raw point list
+  private Knot previousKnot;
+  private Knot currentKnot;
+  private float mag;
+  private float numSteps;
+  private float distMin = 0;
+  private float stepSize = 1;
   
-  Path()
+  public Path()
   {
     // nothing to do
   }
 
-  Path(Knot startingPoint)
+  public Path(Knot startingPoint)
   {
     this.add(startingPoint);
   }
   
-  Path(Knot startingPoint, float step_size)
+  public Path(Knot startingPoint, float step_size)
   {
     this.stepSize = step_size;
     this.add(startingPoint);
@@ -30,9 +30,9 @@ class Path
   /**
    * TODO: rename this method.
    */
-  void add(Knot k)
+  public void add(Knot k)
   {
-    if (this.pointList == null)
+    if (this.knots == null)
     {
       this.createList(k);
     }
@@ -50,12 +50,12 @@ class Path
     this.previousKnot = k;
     this.currentKnot  = k;
     
-    if (this.pointList == null)
+    if (this.knots == null)
     {
-      this.pointList = new ArrayList<Knot>();
+      this.knots = new ArrayList<Knot>();
     }
-    this.pointList.add(this.previousKnot);
-    this.pointList.add(this.currentKnot);
+    this.knots.add(this.previousKnot);
+    this.knots.add(this.currentKnot);
   }
   
   /** 
@@ -64,8 +64,13 @@ class Path
    */
   private void newKnot(Knot k)
   {
-    int size = this.pointList.size();
-    this.previousKnot = this.pointList.get(size - 1);
+    int size = this.knots.size();
+    if (size == 0)
+    {
+      this.createList(k);
+      return;
+    }
+    this.previousKnot = this.knots.get(size - 1);
     this.currentKnot = k;
     // Compute the vector from previous to current knot
     PVector prevPos = this.previousKnot.getPos();
@@ -89,25 +94,25 @@ class Path
                 currentKnot.getColor(), i / numSteps);
         Knot stepKnot = new Knot(interpolatedX, interpolatedY,
                 interpolatedSize, interpolatedColor);
-        this.pointList.add(stepKnot);
+        this.knots.add(stepKnot);
       }
     }
     else
     {
-      this.pointList.add(this.currentKnot);
+      this.knots.add(this.currentKnot);
     }
   }
   
-  void draw(PGraphics buffer, PShader shader)
+  public void draw(PGraphics buffer, PShader shader)
   {
-    for (Knot p: this.pointList)
+    for (Knot p: this.knots)
     {
       p.draw(buffer, shader);
     }
   }
   
-  void clear()
+  public void clear()
   {
-    this.pointList.clear();
+    this.knots.clear();
   }
 }

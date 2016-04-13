@@ -5,15 +5,16 @@
  */
 class Knot extends PVector
 {  
-  float size;
-  color col;
-  float angle;  
-  float noiseDepth; // for spray pattern generation
-  float timestamp;  // for replay
+  private float size;
+  private color col;
+  private float angle;  
+  private float noiseDepth; // for spray pattern generation
+  private float timestamp;  // for replay
   //PGraphics targetBuffer;
-  boolean isDrawn = false;
+  private boolean isDrawn = false;
+  private boolean debug = false;
   
-  Knot(float x, float y, float weight, color tint)
+  public Knot(float x, float y, float weight, color tint)
   {
     super(x, y);
     this.size = weight;
@@ -23,17 +24,17 @@ class Knot extends PVector
     this.timestamp  = millis();
   }
   
-  PVector getPos()
+  public PVector getPos()
   {
     return new PVector(x, y);
   }
   
-  float getSize()
+  public float getSize()
   {
     return this.size;
   }
   
-  color getColor()
+  public color getColor()
   {
     return this.col;
   }
@@ -41,13 +42,13 @@ class Knot extends PVector
   /**
    * @param shader: Our point shader.
    */
-  void draw(PGraphics targetBuffer, PShader shader)
+  public void draw(PGraphics targetBuffer, PShader shader)
   {
     float x = this.x;
     float y = this.y;
     PVector dir = new PVector(x, y);
     dir.normalize();
-    if (! isDrawn)
+    if (! this.isDrawn)
     {
       shader.set("weight", this.size);
       shader.set("direction", dir.x, dir.y);
@@ -63,18 +64,22 @@ class Knot extends PVector
       targetBuffer.point(x, y); 
       
       //targetBuffer.resetShader();
-      isDrawn = true;
+      this.isDrawn = true;
     }
-    if (debug) 
+    if (this.debug) 
     {
       pushMatrix();
         pushStyle();
-          fill(255,0,0);
+          fill(255, 0, 0);
           noStroke();
           translate(x,y);
-          ellipse(0,0,5,5);
+          ellipse(0, 0, 5, 5);
         popStyle();
       popMatrix();
     }   
+  }
+  void set_debug(boolean value)
+  {
+    this.debug = value;
   }
 }
