@@ -1,120 +1,181 @@
-// Press CTRL+Z to undo, CTRL+SHIFT+Z to redo 
+/**
+ * Press CTRL+Z to undo, CTRL+SHIFT+Z to redo.
+ */
+
 // We need these to know if CTRL/SHIFT are pressed
 boolean controlDown = false;
 boolean shiftDown = false;
  
 Undo undo;
+PGraphics paintscreen;
  
-void setup() {
- size(500, 500);
-  background(255);
+void setup()
+{
+  size(500, 500, P3D);
   undo = new Undo(10);
+  paintscreen = createGraphics(width, height, P3D);
+  paintscreen.beginDraw();
+  paintscreen.background(255);
+  undo.takeSnapshot(paintscreen);
+  paintscreen.endDraw();
 }
-void draw() {
+
+void draw()
+{
+  paintscreen.beginDraw();
   // Our two line drawing program
   if (mousePressed)
-    line(mouseX, mouseY, pmouseX, pmouseY);
+  {
+    paintscreen.line(mouseX, mouseY, pmouseX, pmouseY);
+  }
+  paintscreen.endDraw();
+  image(paintscreen, 0, 0);
 }
-void mouseReleased() {
+
+void mouseReleased()
+{
   // Save each line we draw to our stack of UNDOs
-  undo.takeSnapshot();
+  undo.takeSnapshot(paintscreen);
 }
  
-void keyPressed() {
+void keyPressed()
+{
   // Remember if CTRL or SHIFT are pressed or not
-  if (key == CODED) {
+  if (key == CODED)
+  {
     if (keyCode == CONTROL)
+    {
       controlDown = true;
+    }
     if (keyCode == SHIFT)
+    {
       shiftDown = true;
+    }
     return;
   }
   // Check if we pressed CTRL+Z or CTRL+SHIFT+Z
-  if (controlDown) {
-    if (keyCode == 'Z') {
+  if (controlDown)
+  {
+    if (keyCode == 'Z')
+    {
       if (shiftDown)
-        undo.redo();
+      {
+        paintscreen.beginDraw();
+        undo.redo(paintscreen);
+        paintscreen.endDraw();
+      }
       else
-        undo.undo();
+      {
+        paintscreen.beginDraw();
+        undo.undo(paintscreen);
+        paintscreen.endDraw();
+      }
     }
     return;
   }
   // Check if we pressed the S key
-  if (key=='s') {
-    saveFrame("image####.png");
+  if (key=='s')
+  {
+    //paintscreen.saveFrame("image####.png");
   }
 }
- 
- 
-void keyReleased() {
+
+void keyReleased()
+{
   // Remember if CTRL or SHIFT are pressed or not
-  if (key == CODED) {
+  if (key == CODED)
+  {
     if (keyCode == CONTROL)
+    {
       controlDown = false;
+    }
     if (keyCode == SHIFT)
+    {
       shiftDown = false;
+    }
   }
-}
+} 
  
- 
-class Undo {
+class Undo
+{
   // Number of currently available undo and redo snapshots
-  int undoSteps=0, redoSteps=0; 
+  int undoSteps = 0;
+  int redoSteps = 0;
   CircImgCollection images;
  
-  Undo(int levels) {
-    images = new CircImgCollection(levels);
+  Undo(int levels)
+  {
+    this.images = new CircImgCollection(levels);
   }
  
-  public void takeSnapshot() {
-    undoSteps = min(undoSteps+1, images.amount-1);
+  public void takeSnapshot(PGraphics screen)
+  {
+    this.undoSteps = min(this.undoSteps + 1, this.images.amount - 1);
     // each time we draw we disable redo
-    redoSteps = 0;
-    images.next();
-    images.capture();
+    this.redoSteps = 0;
+    this.images.next();
+    this.images.capture(screen);
   }
-  public void undo() {
-    if(undoSteps > 0) {
-      undoSteps--;
-      redoSteps++;
-      images.prev();
-      images.show();
+  
+  public void undo(PGraphics screen)
+  {
+    if (this.undoSteps > 0)
+    {
+      this.undoSteps --;
+      this.redoSteps ++;
+      this.images.prev();
+      this.images.show(screen);
     }
   }
-  public void redo() {
-    if(redoSteps > 0) {
-      undoSteps++;
-      redoSteps--;
-      images.next();
-      images.show();
+  
+  public void redo(PGraphics screen)
+  {
+    if (this.redoSteps > 0)
+    {
+      this.undoSteps ++;
+      this.redoSteps --;
+      this.images.next();
+      this.images.show(screen);
     }
   }
 }
- 
- 
-class CircImgCollection {
-  int amount, current;
+
+class CircImgCollection
+{
+  int amount;
+  int current;
   PImage[] img;
-  CircImgCollection(int amountOfImages) {
-    amount = amountOfImages;
+  
+  CircImgCollection(int amountOfImages)
+  {
+    this.amount = amountOfImages;
  
     // Initialize all images as copies of the current display
-    img = new PImage[amount];
-    for (int i=0; i<amount; i++) {
-      img[i] = createImage(width, height, RGB);
-      img[i] = get();
+    this.img = new PImage[this.amount];
+    for (int i = 0; i < this.amount; i++)
+    {
+      this.img[i] = createImage(width, height, RGB);
+      this.img[i] = get();
     }
   }
-  void next() {
-    current = (current + 1) % amount;
+  
+  void next()
+  {
+    this.current = (this.current + 1) % this.amount;
   }
-  void prev() {
-    current = (current - 1 + amount) % amount;
+  
+  void prev()
+  {
+    this.current = (this.current - 1 + this.amount) % this.amount;
   }
-  void capture() {
-    img[current] = get();
+  
+  void capture(PGraphics screen)
+  {
+    this.img[this.current] = screen.get();
   }
-  void show() {
-    image(img[current], 0, 0);
+  
+  void show(PGraphics screen)
+  {
+    screen.image(this.img[current], 0, 0);
   }
 }
