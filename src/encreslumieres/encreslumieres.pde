@@ -7,7 +7,7 @@
  * - syphon
  */
 // XXX comment out next line if not using Syphon
-//import codeanticode.syphon.SyphonServer;
+import codeanticode.syphon.SyphonServer;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
@@ -84,17 +84,25 @@ PGraphics paintscreen;
 OscP5 osc_receiver;
 NetAddress osc_send_address;
 // XXX comment out next line if not using Syphon
-//SyphonServer syphon_server;
+SyphonServer syphon_server;
 
 int VIDEO_OUTPUT_WIDTH;
 int VIDEO_OUTPUT_HEIGHT;
 ArrayList<GraffitiInfo> graffitis;
 
+
+void settings()
+{
+  size(displayWidth, displayHeight, P3D);
+  // XXX comment out next line if not using Syphon
+  PJOGL.profile = 1;
+}
+
 void setup()
 {
   println("Encres & lumieres version " + VERSION);
   //size(640, , P3D);
-  size(displayWidth, displayHeight, P3D);
+  
   frameRate(60);
   VIDEO_OUTPUT_WIDTH = width;
   VIDEO_OUTPUT_HEIGHT = height;
@@ -102,7 +110,7 @@ void setup()
   osc_receiver = new OscP5(this, OSC_RECEIVE_PORT);
   osc_send_address = new NetAddress(OSC_SEND_HOST, OSC_SEND_PORT);
   // XXX comment out next line if not using Syphon
-  //syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
+  syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
   paintscreen = createGraphics(width, height, P3D);
   background_image = loadImage("background.png");
   sprayMap = loadImage("sprayMap.png");
@@ -129,7 +137,7 @@ void draw()
   draw_graffitis();
   draw_cursors();
   // XXX comment out next line if not using Syphon
-  // syphon_server.sendScreen();
+  syphon_server.sendScreen();
 }
 
 /**
