@@ -19,8 +19,17 @@ final String SYPHON_SERVER_NAME = "encres&lumieres";
 final boolean debug = false; // also draw a red stroke
 final int BLOB_INPUT_WIDTH = 640;
 final int BLOB_INPUT_HEIGHT = 480;
-final int FORCE_MAX = 1023; // no need to change this
-final int FORCE_THRESHOLD = 623; // you might need to change this
+/*
+ * Now, the /force we receive from the Arduino over wifi is 
+ * within the range [0,1023] and we invert the number, so that
+ * if we received, 100, example, we will turn it here into
+ * 1023 - 100, which results in 923. Now we will compare it to
+ * a threshold, for example 400. If that inverted force is over
+ * 400, the brush will be on. FORCE_THRESHOLD is what you will
+ * need to change often. See below.
+ */
+final int FORCE_MAX = 1023; // DO NOT change this
+final int FORCE_THRESHOLD = 200; // you will need to change this. Used to be 623
 final int BRUSH_MIN = 50;
 final int BRUSH_MAX = 150;
 final String VERSION = "0.2.1";
@@ -240,8 +249,8 @@ void handle_force(int identifier, int force)
   }
   // Store the previous state
   graffiti.force_was_pressed = graffiti.force_is_pressed;
+  
   // Invert the number
-
   force = FORCE_MAX - force;
   if (force > FORCE_THRESHOLD)
   {
