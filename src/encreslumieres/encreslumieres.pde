@@ -41,6 +41,7 @@ PShader point_shader; // See http://glsl.heroku.com/e#4633.5
 // Spray density distribution expressed in grayscale gradient
 PImage sprayMap;
 PImage background_image;
+Undo undo;
 PGraphics paintscreen;
 OscP5 osc_receiver;
 NetAddress osc_send_address;
@@ -67,6 +68,7 @@ void setup()
   frameRate(60);
   VIDEO_OUTPUT_WIDTH = width;
   VIDEO_OUTPUT_HEIGHT = height;
+  undo = new Undo(10, VIDEO_OUTPUT_WIDTH, VIDEO_OUTPUT_HEIGHT);
   // start oscP5, listening for incoming messages at a given port
   osc_receiver = new OscP5(this, OSC_RECEIVE_PORT);
   osc_send_address = new NetAddress(OSC_SEND_HOST, OSC_SEND_PORT);
@@ -80,7 +82,9 @@ void setup()
   point_shader.set("sprayMap", sprayMap);
   paintscreen.beginDraw();
   paintscreen.image(background_image, 0, 0);
+  undo.takeSnapshot(paintscreen); // might need to move this after paintscreen.endDraw() below
   paintscreen.endDraw();
+  
 
   graffitis = new ArrayList<GraffitiInfo>();
   for (int i = 0; i < 10; i++)
@@ -144,8 +148,9 @@ void graffiti_reset()
 {
   paintscreen.beginDraw();
   paintscreen.image(background_image, 0, 0);
+  undo.takeSnapshot(paintscreen); // might need to move this after paintscreen.endDraw() below
   paintscreen.endDraw();
-
+  
   for (int i = 0; i < graffitis.size(); i++)
   {
     graffitis.get(i).spray_can.clearAll();
@@ -169,16 +174,46 @@ void mousePressed()
           graffitis.get(MOUSE_GRAFFITI_IDENTIFIER).brush_weight);
 }
 
+void mouseReleased()
+{
+  paintscreen.beginDraw();
+  undo.takeSnapshot(paintscreen);
+  paintscreen.endDraw();
+}
+
+void do_redo()
+{
+  println("redo");
+  paintscreen.beginDraw();
+  undo.redo(paintscreen);
+  paintscreen.endDraw();
+}
+
+void do_undo()
+{
+  println("undo");
+  paintscreen.beginDraw();
+  undo.undo(paintscreen);
+  paintscreen.endDraw();
+}
 
 void keyPressed()
 {
-  if (key == 'r' || key == 'R')
+  if (key == 'x' || key == 'X')
   {
     graffiti_reset();
   }
-  if (key == 's' || key == 'S')
+  else if (key == 's' || key == 'S')
   {
     graffiti_snapshot();
+  }
+  else if (key == 'z' || key == 'Z')
+  {
+    do_undo();
+  }
+  else if (key == 'r' || key == 'R')
+  {
+    do_redo();
   }
 }
 
@@ -367,6 +402,7 @@ void create_points_if_needed()
         println("end");
       }
       // spray_end();
+      undo.takeSnapshot(paintscreen);
     }
   }
 }
