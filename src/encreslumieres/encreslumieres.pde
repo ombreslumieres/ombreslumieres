@@ -5,6 +5,15 @@
  * Dependencies:
  * - oscP5
  * - syphon
+ *
+ * To run: Command-R (or Control-R)
+ * To run full screen: Command-Shift-R (or Control-Shift-R)
+ * 
+ * Interactive controls:
+ * - z: undo 
+ * - r: redo
+ * - x: reset
+ * - s: save snapshot
  */
 // XXX comment out next line if not using Syphon
 import codeanticode.syphon.SyphonServer;
@@ -490,5 +499,13 @@ void oscEvent(OscMessage message)
       weight = (int) message.get(1).floatValue();
     }
     handle_brush_weight(identifier, weight);
+  }
+  else if (message.checkAddrPattern("/undo"))
+  {
+    do_undo();
+  }
+  else if (message.checkAddrPattern("/redo"))
+  {
+    do_redo();
   }
 }

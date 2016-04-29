@@ -66,3 +66,25 @@ Arguments:
 
 Description:
 Sets the weight of a brush.
+
+
+undo
+----
+Signature:
+* /undo
+
+Arguments: no argument
+
+Description:
+Undos the last stroke that ended.
+
+
+redo
+----
+Signature:
+* /redo
+
+Arguments: no argument
+
+Description:
+Redos the last thing undone. (see /undo)
