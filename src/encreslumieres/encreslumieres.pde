@@ -440,13 +440,11 @@ void oscEvent(OscMessage message)
       identifier = message.get(0).intValue();
       force = (int) message.get(1).floatValue();
     }
-    else if (message.checkTypetag("i")) // FIXME: remove this legacy signature
+    else
     {
-      force = message.get(0).intValue();
-    }
-    else if (message.checkTypetag("f"))  // FIXME: remove this legacy signature
-    {
-      force = (int) message.get(0).floatValue();
+      println("Wrong OSC typetags for /force.");
+      // we use to support only the value - no identifier, but
+      // not anymore
     }
     handle_force(identifier, force);
   }
@@ -461,6 +459,10 @@ void oscEvent(OscMessage message)
       x = message.get(1).floatValue();
       y = message.get(2).floatValue();
       size = message.get(3).floatValue();
+    }
+    else
+    {
+      println("Wrong OSC typetags for /blob.");
     }
     handle_blob(identifier, x, y, size);
   }
@@ -483,6 +485,10 @@ void oscEvent(OscMessage message)
       g = (int) message.get(2).floatValue();
       b = (int) message.get(3).floatValue();
     }
+    else
+    {
+      println("Wrong OSC typetags for /color.");
+    }
     handle_color(identifier, r, g, b);
   }
   else if (message.checkAddrPattern("/brush/weight"))
@@ -497,6 +503,10 @@ void oscEvent(OscMessage message)
     {
       identifier = message.get(0).intValue();
       weight = (int) message.get(1).floatValue();
+    }
+    else
+    {
+      println("Wrong OSC typetags for /brush/weight.");
     }
     handle_brush_weight(identifier, weight);
   }
