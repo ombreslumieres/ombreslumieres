@@ -21,7 +21,7 @@ class Undo
   
   public void undo(PGraphics screen)
   {
-    if (this.undoSteps > 0)
+    if (this.undoSteps > 1)
     {
       this.undoSteps --;
       this.redoSteps ++;
