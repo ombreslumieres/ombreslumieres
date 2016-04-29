@@ -36,6 +36,10 @@ final String VERSION = "0.2.1";
 final float BRUSH_SCALE = 0.3; // FIXME: ratio taken from Knot.pde (not quite right)
 final int MOUSE_GRAFFITI_IDENTIFIER = 0;
 
+
+/**
+ * TODO: could be merged with SprayCan.
+ */
 class GraffitiInfo
 {
   public SprayCan spray_can;
@@ -85,6 +89,7 @@ class GraffitiInfo
   }
 }
 
+
 PShader point_shader; // See http://glsl.heroku.com/e#4633.5
 // Spray density distribution expressed in grayscale gradient
 PImage sprayMap;
@@ -94,7 +99,6 @@ OscP5 osc_receiver;
 NetAddress osc_send_address;
 // XXX comment out next line if not using Syphon
 SyphonServer syphon_server;
-
 int VIDEO_OUTPUT_WIDTH;
 int VIDEO_OUTPUT_HEIGHT;
 ArrayList<GraffitiInfo> graffitis;
@@ -106,6 +110,7 @@ void settings()
   // XXX comment out next line if not using Syphon
   PJOGL.profile = 1;
 }
+
 
 void setup()
 {
@@ -139,6 +144,7 @@ void setup()
   }
 }
 
+
 void draw()
 {
   background(0);
@@ -148,6 +154,7 @@ void draw()
   // XXX comment out next line if not using Syphon
   syphon_server.sendScreen();
 }
+
 
 /**
  * Draw the graffiti strokes.
@@ -163,6 +170,7 @@ void draw_graffitis()
   paintscreen.endDraw();
   image(paintscreen, 0, 0);
 }
+
 
 /**
  * Draw the cursor.
@@ -181,6 +189,7 @@ void draw_cursors()
   }
 }
 
+
 /**
  * Clears all the graffiti strokes.
  */
@@ -196,6 +205,7 @@ void graffiti_reset()
   }
 }
 
+
 /**
  * Take a snapshot.
  */
@@ -204,10 +214,14 @@ void graffiti_snapshot()
   saveFrame();
 }
 
+
 void mousePressed()
 {
-  graffitis.get(MOUSE_GRAFFITI_IDENTIFIER).graffiti_start_stroke(mouseX, mouseY, graffitis.get(MOUSE_GRAFFITI_IDENTIFIER).brush_weight);
+  graffitis.get(MOUSE_GRAFFITI_IDENTIFIER).graffiti_start_stroke(
+          mouseX, mouseY,
+          graffitis.get(MOUSE_GRAFFITI_IDENTIFIER).brush_weight);
 }
+
 
 void keyPressed()
 {
@@ -221,6 +235,7 @@ void keyPressed()
   }
 }
 
+
 boolean graffiti_has_index(int index)
 {
   if (index >= graffitis.size() || index < 0)
@@ -231,6 +246,7 @@ boolean graffiti_has_index(int index)
     return true;
   }
 }
+
 
 /**
  * Handles /force OSC messages.
@@ -263,6 +279,7 @@ void handle_force(int identifier, int force)
   }
 }
 
+
 /**
  * Handles /blob OSC messages.
  */
@@ -283,6 +300,7 @@ void handle_blob(int identifier, float x, float y, float size)
   graffiti.blob_size = size; // unused
 }
 
+
 /**
  * Handles /brush/weight OSC messages.
  */
@@ -300,6 +318,7 @@ void handle_brush_weight(int identifier, int weight)
   }
   graffiti.brush_weight = weight;
 }
+
 
 /**
  * Handles /color OSC messages.
@@ -319,6 +338,7 @@ void handle_color(int identifier, int r, int g, int b)
   graffiti.graffiti_set_color(color(r, g, b));
 }
 
+
 /**
  * Convert a X coordinate from blob range to display range.
  */
@@ -326,6 +346,7 @@ float map_x(float value)
 {
   return map(value, 0.0, BLOB_INPUT_WIDTH, 0.0, VIDEO_OUTPUT_WIDTH);
 }
+
 
 /**
  * Convert a Y coordinate from blob range to display range.
@@ -348,6 +369,7 @@ float map_y(float value)
 //   ret = map(ret, 0.0, 1.0, BRUSH_MIN, BRUSH_MAX);
 //   return ret;
 // }
+
 
 /**
  * Does the job of creating the points in the stroke, if we received OSC messages.
@@ -378,12 +400,18 @@ void create_points_if_needed()
         println("begin");
       }
       // TODO: use blob_size and force to calculate brush_weight
-      graffiti.graffiti_start_stroke((int) graffiti.blob_x, (int) graffiti.blob_y, (int) graffiti.brush_weight);
+      graffiti.graffiti_start_stroke(
+              (int) graffiti.blob_x,
+              (int) graffiti.blob_y,
+              (int) graffiti.brush_weight);
     }
     else if (graffiti.force_was_pressed && graffiti.force_is_pressed)
     {
       // TODO: use blob_size and force to calculate brush_weight
-      graffiti.graffiti_add_knot_to_stroke((int) graffiti.blob_x, (int) graffiti.blob_y, (int) graffiti.brush_weight);
+      graffiti.graffiti_add_knot_to_stroke(
+              (int) graffiti.blob_x,
+              (int) graffiti.blob_y,
+              (int) graffiti.brush_weight);
     }
     else if (graffiti.force_was_pressed && ! graffiti.force_is_pressed)
     {
@@ -395,6 +423,7 @@ void create_points_if_needed()
     }
   }
 }
+
 
 /**
  * Incoming osc message are forwarded to the oscEvent method.
