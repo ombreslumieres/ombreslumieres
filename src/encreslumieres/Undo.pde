@@ -21,7 +21,9 @@ class Undo
   
   public void undo(PGraphics screen)
   {
-    if (this.undoSteps > 1)
+    int LAST_UNDO_STEP = 1;  // used to be 0
+    // but it was causing a blank grey image at the last undo level
+    if (this.undoSteps > LAST_UNDO_STEP)
     {
       this.undoSteps --;
       this.redoSteps ++;

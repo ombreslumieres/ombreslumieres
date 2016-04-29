@@ -26,7 +26,7 @@ class Knot extends PVector
   
   public PVector getPos()
   {
-    return new PVector(x, y);
+    return new PVector(this.x, this.y);
   }
   
   public float getSize()
@@ -44,9 +44,7 @@ class Knot extends PVector
    */
   public void draw(PGraphics targetBuffer, PShader shader)
   {
-    float x = this.x;
-    float y = this.y;
-    PVector dir = new PVector(x, y);
+    PVector dir = new PVector(this.x, this.y);
     dir.normalize();
     if (! this.isDrawn)
     {
@@ -61,7 +59,7 @@ class Knot extends PVector
       targetBuffer.strokeWeight(this.size);
       targetBuffer.stroke(this.col);
       targetBuffer.shader(shader, POINTS);
-      targetBuffer.point(x, y); 
+      targetBuffer.point(this.x, this.y); 
       
       //targetBuffer.resetShader();
       this.isDrawn = true;
@@ -72,13 +70,14 @@ class Knot extends PVector
         pushStyle();
           fill(255, 0, 0);
           noStroke();
-          translate(x,y);
+          translate(this.x, this.y);
           ellipse(0, 0, 5, 5);
         popStyle();
       popMatrix();
     }   
   }
-  void set_debug(boolean value)
+  
+  public void set_debug(boolean value)
   {
     this.debug = value;
   }
