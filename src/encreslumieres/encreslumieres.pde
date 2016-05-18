@@ -94,7 +94,6 @@ void setup()
   undo.takeSnapshot(paintscreen); // might need to move this after paintscreen.endDraw() below
   paintscreen.endDraw();
   
-
   graffitis = new ArrayList<GraffitiInfo>();
   for (int i = 0; i < 10; i++)
   {
@@ -384,7 +383,8 @@ void create_points_if_needed()
   for (int i = 0; i < graffitis.size(); i++)
   {
     GraffitiInfo graffiti = graffitis.get(i);
-    if (! graffiti.force_was_pressed && graffiti.force_is_pressed)
+    // Start pressing:
+    if ((! graffiti.force_was_pressed) && graffiti.force_is_pressed)
     {
       if (debug)
       {
@@ -396,6 +396,7 @@ void create_points_if_needed()
               (int) graffiti.blob_y,
               (int) graffiti.brush_weight);
     }
+    // continue to press:
     else if (graffiti.force_was_pressed && graffiti.force_is_pressed)
     {
       // TODO: use blob_size and force to calculate brush_weight
@@ -404,6 +405,7 @@ void create_points_if_needed()
               (int) graffiti.blob_y,
               (int) graffiti.brush_weight);
     }
+    // stop pressing:
     else if (graffiti.force_was_pressed && ! graffiti.force_is_pressed)
     {
       if (debug)
