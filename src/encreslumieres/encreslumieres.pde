@@ -21,6 +21,7 @@ import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 
+
 final int OSC_RECEIVE_PORT = 31340;
 final int OSC_SEND_PORT = 13333;
 final String OSC_SEND_HOST = "127.0.0.1";
@@ -38,7 +39,7 @@ final int BLOB_INPUT_HEIGHT = 480;
  * need to change often. See below.
  */
 final int FORCE_MAX = 1023; // DO NOT change this
-final int FORCE_THRESHOLD = 200; // you will need to change this. Used to be 623
+final int FORCE_THRESHOLD = 150; // you will need to change this. Used to be 623, then 200
 final int BRUSH_MIN = 50;
 final int BRUSH_MAX = 150;
 final String VERSION = "0.2.1";
@@ -124,7 +125,7 @@ void draw_graffitis()
   paintscreen.strokeCap(SQUARE);
   for (int i = 0; i < graffitis.size(); i++)
   {
-    graffitis.get(i).spray_can.draw(paintscreen, point_shader);
+    graffitis.get(i).spray_can.draw_spraycan(paintscreen, point_shader);
   }
   paintscreen.endDraw();
   image(paintscreen, 0, 0);
@@ -182,6 +183,7 @@ void mousePressed()
           graffitis.get(MOUSE_GRAFFITI_IDENTIFIER).brush_weight);
 }
 
+
 void mouseReleased()
 {
   paintscreen.beginDraw();
@@ -189,13 +191,16 @@ void mouseReleased()
   paintscreen.endDraw();
 }
 
+
 void do_redo()
 {
   println("redo");
   paintscreen.beginDraw();
   undo.redo(paintscreen);
   paintscreen.endDraw();
+  // FIXME: we probably need to re-add a path from our spraycan here
 }
+
 
 void do_undo()
 {
@@ -203,7 +208,9 @@ void do_undo()
   paintscreen.beginDraw();
   undo.undo(paintscreen);
   paintscreen.endDraw();
+  // FIXME: we probably need to remove a path from our spraycan here
 }
+
 
 void keyPressed()
 {

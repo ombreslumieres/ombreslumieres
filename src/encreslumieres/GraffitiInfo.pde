@@ -20,6 +20,7 @@ class GraffitiInfo
   {
     this.spray_can = new SprayCan();
   }
+  
   /**
    * Starts a graffiti stroke.
    */
@@ -27,6 +28,7 @@ class GraffitiInfo
   {
     this.spray_can.newStroke(x, y, the_weight);
   }
+  
   /**
    * Sets the graffiti color.
    */
@@ -34,6 +36,7 @@ class GraffitiInfo
   {
     this.spray_color = new_color;
   }
+  
   /**
    * Sets the graffiti brush weight.
    */
@@ -41,6 +44,7 @@ class GraffitiInfo
   {
     this.brush_weight = new_weight;
   }
+  
   /**
    * Add a knot to the current graffiti stroke.
    */

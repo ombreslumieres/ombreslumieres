@@ -46,7 +46,13 @@ class Knot extends PVector
   {
     PVector dir = new PVector(this.x, this.y);
     dir.normalize();
-    if (! this.isDrawn)
+    
+    if (this.isDrawn)
+    {
+      return; // we draw each knot only once! (using a shader)
+      // we store those pixels in a pixel buffer.
+    }
+    else
     {
       shader.set("weight", this.size);
       shader.set("direction", dir.x, dir.y);

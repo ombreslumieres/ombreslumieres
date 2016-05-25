@@ -18,19 +18,20 @@ class Path
 
   public Path(Knot startingPoint)
   {
-    this.add(startingPoint);
+    this.add_knot(startingPoint);
   }
   
   public Path(Knot startingPoint, float step_size)
   {
     this.stepSize = step_size;
-    this.add(startingPoint);
+    this.add_knot(startingPoint);
   }
   
   /**
-   * TODO: rename this method.
+   * Adds a new knot, either a first knot in a new path, 
+   * or one more knot in an existing one.
    */
-  public void add(Knot k)
+  public void add_knot(Knot k)
   {
     if (this.knots == null)
     {
@@ -48,14 +49,14 @@ class Path
   private void createList(Knot k)
   { 
     this.previousKnot = k;
-    this.currentKnot  = k;
+    this.currentKnot = k;
     
     if (this.knots == null)
     {
       this.knots = new ArrayList<Knot>();
     }
-    this.knots.add(this.previousKnot);
-    this.knots.add(this.currentKnot);
+    this.knots.add(k);
+    // XXX this.knots.add(this.currentKnot); // FIXME: why do we add the first knot twice?
   }
   
   /** 
@@ -70,6 +71,7 @@ class Path
       this.createList(k);
       return;
     }
+    
     this.previousKnot = this.knots.get(size - 1);
     this.currentKnot = k;
     // Compute the vector from previous to current knot
@@ -86,8 +88,8 @@ class Path
       numSteps = mag / stepSize;
       for (int i = 1; i < numSteps; i++)
       {
-        float interpolatedX = lerp(previousKnot.x,  currentKnot.x, i / numSteps);
-        float interpolatedY = lerp(previousKnot.y,  currentKnot.y, i / numSteps);
+        float interpolatedX = lerp(previousKnot.x, currentKnot.x, i / numSteps);
+        float interpolatedY = lerp(previousKnot.y, currentKnot.y, i / numSteps);
         float interpolatedSize  = lerp(previousKnot.getSize(),
                 currentKnot.getSize(), i / numSteps);
         color interpolatedColor = lerpColor(previousKnot.getColor(),
@@ -103,7 +105,7 @@ class Path
     }
   }
   
-  public void draw(PGraphics buffer, PShader shader)
+  public void draw_path(PGraphics buffer, PShader shader)
   {
     for (Knot p: this.knots)
     {
@@ -111,7 +113,7 @@ class Path
     }
   }
   
-  public void clear()
+  public void clear_path()
   {
     this.knots.clear();
   }

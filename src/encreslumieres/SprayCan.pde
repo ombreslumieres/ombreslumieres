@@ -9,19 +9,19 @@ class SprayCan
  
  public SprayCan()
  {
-   paths = new ArrayList<Path>();
-   col = color(0);
+   this.paths = new ArrayList<Path>();
+   this.col = color(0);
  }
  
  /**
   * Draws all its strokes.
   * NOTE: points are only drawn once so you should not redraw the background
   */
- public void draw(PGraphics buffer, PShader shader)
+ public void draw_spraycan(PGraphics buffer, PShader shader)
  {
    for (Path p: this.paths)
    {
-     p.draw(buffer, shader);
+     p.draw_path(buffer, shader);
    }
  }
  
@@ -32,9 +32,10 @@ class SprayCan
  {
    for (Path p: this.paths)
    {
-     p.clear();
+     p.clear_path();
    }
    this.paths.clear();
+   // FIXME: we probably need to remove each path in our array list, we is not done here.
  }
  
  /**
@@ -61,12 +62,14 @@ class SprayCan
    }
    else
    {
-     activePath.add(newKnot);
+     activePath.add_knot(newKnot);
    }
  }
  
  /**
   * Return the stroke beeing drawn at the moment.
+  *
+  * FIXME: does this take into account the undo stack?
   */
  private Path getActivePath()
  {
