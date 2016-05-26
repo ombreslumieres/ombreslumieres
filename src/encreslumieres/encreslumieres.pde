@@ -252,8 +252,16 @@ void handle_force(int identifier, int force)
 {
   if (! graffiti_has_index(identifier))
   {
-    println("No such index " + identifier);
+    if (identifier == 0)
+    {
+      println("handle_force: no graffiti stroke yet");
+    }
+    else
+    {
+      println("handle_force: No such index " + identifier);
+    }
     return;
+    //identifier = 0; // FIXME: so that we support old legacy cannette Arduino code.
   }
   GraffitiInfo graffiti = graffitis.get(identifier);
   if (debug)
@@ -274,6 +282,9 @@ void handle_force(int identifier, int force)
   {
     graffiti.force_is_pressed = false;
   }
+  
+  // FIXME: I don't think this belongs here.
+  //create_points_if_needed();
 }
 
 
@@ -387,6 +398,7 @@ void create_points_if_needed()
     GraffitiInfo graffiti = graffitis.get(MOUSE_GRAFFITI_IDENTIFIER);
     graffiti.graffiti_add_knot_to_stroke(mouseX, mouseY, graffiti.brush_weight);
   }
+  
   for (int i = 0; i < graffitis.size(); i++)
   {
     GraffitiInfo graffiti = graffitis.get(i);
@@ -395,7 +407,7 @@ void create_points_if_needed()
     {
       if (debug)
       {
-        println("begin");
+        println("begin at " + graffiti.blob_x + " " + graffiti.blob_y);
       }
       // TODO: use blob_size and force to calculate brush_weight
       graffiti.graffiti_start_stroke(
@@ -413,15 +425,19 @@ void create_points_if_needed()
               (int) graffiti.brush_weight);
     }
     // stop pressing:
-    else if (graffiti.force_was_pressed && ! graffiti.force_is_pressed)
+    else if (graffiti.force_was_pressed && (! graffiti.force_is_pressed))
     {
+      graffiti.force_was_pressed = false;
+      graffiti.force_is_pressed = false;
       if (debug)
       {
-        println("end");
+        //println("end");
+        println("end at " + graffiti.blob_x + " " + graffiti.blob_y);
       }
       // spray_end();
       undo.takeSnapshot(paintscreen);
     }
+    graffiti.force_was_pressed = graffiti.force_is_pressed;
   }
 }
 
