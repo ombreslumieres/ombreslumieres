@@ -43,7 +43,7 @@ class App
     {
       SprayCan item = new SprayCan(width, height); // FIXME using global vars here.
       item.set_color(color(255, 127, 63, 127)); // default color is 50% orange
-      item.set_brush_size(64); // default brush size is 54
+      item.set_brush_size(32); // default brush size
       item.set_current_brush(this._test_brush);
       this._spray_cans.add(item);
     }

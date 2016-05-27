@@ -2,15 +2,20 @@
  * Manages one spray can.
  */
 class SprayCan
-{ 
+{
+  // constants
+  private final float DEFAULT_STEP_SIZE = 5.0;
+  private final float DEFAULT_BRUSH_SIZE = 64;
+  
+  // attributes
   private ArrayList<Stroke> _strokes;
   private color _color;
   private float _brush_size;
   private Brush _current_brush;
-  private final float DEFAULT_BRUSH_SIZE = 64;
-  PGraphics _buffer = null;
+  private PGraphics _buffer = null;
   private int _image_width;
   private int _image_height;
+  private float _default_step_size;
   // TODO: add layers here
   // TODO: add undo here
   //private boolean _force_is_pressed = false;
@@ -25,9 +30,10 @@ class SprayCan
     this._strokes = new ArrayList<Stroke>();
     this._color = color(255, 255, 255, 255);
     this._brush_size = this.DEFAULT_BRUSH_SIZE; // FIXME
-    _image_width = image_width;
-    _image_height = image_height;
-    this._buffer = createGraphics(_image_width, _image_height, P3D);
+    this._default_step_size = this.DEFAULT_STEP_SIZE;
+    this._image_width = image_width;
+    this._image_height = image_height;
+    this._buffer = createGraphics(this._image_width, this._image_height, P3D);
   }
 
   void set_current_brush(Brush brush)
@@ -77,7 +83,7 @@ class SprayCan
   {  
     Node starting_node = new Node(x, y, brush_size, this._color);
     this._brush_size = brush_size;
-    Stroke stroke = new Stroke(starting_node);
+    Stroke stroke = new Stroke(starting_node, this._default_step_size);
     stroke.set_brush(this._current_brush);
     this._strokes.add(stroke);
   }
