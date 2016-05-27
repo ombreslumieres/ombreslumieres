@@ -25,6 +25,11 @@ class Stroke
     this.add_knot(startingPoint);
   }
   
+  public void set_step_size(float value)
+  {
+    this._step_size = value;
+  }
+  
   public void set_brush(Brush brush)
   {
     this._brush = brush;
