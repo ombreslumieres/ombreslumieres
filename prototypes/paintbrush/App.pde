@@ -200,15 +200,27 @@ class App
     // TODO
   }
 
-  void do_redo()
+  void handle_redo()
   {
     // TODO
   }
 
 
-  void do_undo()
+  void handle_undo()
   {
     // TODO
+  }
+  
+  public void apply_add_node(int spray_can_index, float x, float y) // , float size)
+  {
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    spray_can.add_node(x, y);
+  }
+  
+  public void apply_new_stroke(int spray_can_index)
+  {
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    spray_can.start_new_stroke();
   }
 
   /**
@@ -238,6 +250,8 @@ class App
   {
     int identifier = 0;
     //print("Received " + message.addrPattern() + " " + message.typetag() + "\n");
+    
+    // ---  /force ---
     if (message.checkAddrPattern("/force"))
     {
       // TODO: parse string identifier as a first OSC argument
@@ -246,18 +260,23 @@ class App
       {
         identifier = message.get(0).intValue();
         force = message.get(1).intValue();
-      } else if (message.checkTypetag("if"))
+      }
+      else if (message.checkTypetag("if"))
       {
         identifier = message.get(0).intValue();
         force = (int) message.get(1).floatValue();
-      } else
+      }
+      else
       {
         println("Wrong OSC typetags for /force.");
         // we use to support only the value - no identifier, but
         // not anymore
       }
       handle_force(identifier, force);
-    } else if (message.checkAddrPattern("/blob"))
+    }
+    
+    // ---  /blob ---
+    else if (message.checkAddrPattern("/blob"))
     {
       float x = 0.0;
       float y = 0.0;
@@ -268,12 +287,16 @@ class App
         x = message.get(1).floatValue();
         y = message.get(2).floatValue();
         size = message.get(3).floatValue();
-      } else
+      }
+      else
       {
         println("Wrong OSC typetags for /blob.");
       }
       handle_blob(identifier, x, y, size);
-    } else if (message.checkAddrPattern("/color"))
+    }
+    
+    // ---  /color ---
+    else if (message.checkAddrPattern("/color"))
     {
       int r = 255;
       int g = 255;
@@ -284,39 +307,52 @@ class App
         r = message.get(1).intValue();
         g = message.get(2).intValue();
         b = message.get(3).intValue();
-      } else if (message.checkTypetag("ifff"))
+      }
+      else if (message.checkTypetag("ifff"))
       {
         identifier = message.get(0).intValue();
         r = (int) message.get(1).floatValue();
         g = (int) message.get(2).floatValue();
         b = (int) message.get(3).floatValue();
-      } else
+      }
+      else
       {
         println("Wrong OSC typetags for /color.");
       }
       handle_color(identifier, r, g, b);
-    } else if (message.checkAddrPattern("/brush/weight"))
+    }
+    
+    // ---  /brush/weight ---
+    else if (message.checkAddrPattern("/brush/weight"))
     {
       int weight = 100;
       if (message.checkTypetag("ii"))
       {
         identifier = message.get(0).intValue();
         weight = message.get(1).intValue();
-      } else if (message.checkTypetag("if"))
+      }
+      else if (message.checkTypetag("if"))
       {
         identifier = message.get(0).intValue();
         weight = (int) message.get(1).floatValue();
-      } else
+      }
+      else
       {
         println("Wrong OSC typetags for /brush/weight.");
       }
       handle_brush_weight(identifier, weight);
-    } else if (message.checkAddrPattern("/undo"))
+    }
+    
+    // ---  /undo ---
+    else if (message.checkAddrPattern("/undo"))
     {
-      do_undo();
-    } else if (message.checkAddrPattern("/redo"))
+      handle_undo();
+    }
+    
+    // ---  /redo ---
+    else if (message.checkAddrPattern("/redo"))
     {
-      do_redo();
+      handle_redo();
     }
   }
 }
