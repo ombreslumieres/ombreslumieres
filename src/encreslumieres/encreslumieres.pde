@@ -66,14 +66,14 @@ void settings()
 {
   size(displayWidth, displayHeight, P3D);
   // XXX comment out next line if not using Syphon
-  PJOGL.profile = 1;
+//  PJOGL.profile = 1;
 }
 
 
 void setup()
 {
   println("Encres & lumieres version " + VERSION);
-  //size(640, , P3D);
+  size(640, 480, P3D);
   
   frameRate(60);
   VIDEO_OUTPUT_WIDTH = width;
@@ -83,7 +83,7 @@ void setup()
   osc_receiver = new OscP5(this, OSC_RECEIVE_PORT);
   osc_send_address = new NetAddress(OSC_SEND_HOST, OSC_SEND_PORT);
   // XXX comment out next line if not using Syphon
-  syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
+  //syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
   paintscreen = createGraphics(width, height, P3D);
   background_image = loadImage("background.png");
   sprayMap = loadImage("sprayMap.png");
@@ -112,7 +112,7 @@ void draw()
   draw_graffitis();
   draw_cursors();
   // XXX comment out next line if not using Syphon
-  syphon_server.sendScreen();
+  //syphon_server.sendScreen();
 }
 
 
@@ -218,7 +218,7 @@ void keyPressed()
   {
     graffiti_reset();
   }
-  else if (key == 's' || key == 'S')
+  else if (key == 's' || key == 'S')
   {
     graffiti_snapshot();
   }
@@ -252,16 +252,8 @@ void handle_force(int identifier, int force)
 {
   if (! graffiti_has_index(identifier))
   {
-    if (identifier == 0)
-    {
-      println("handle_force: no graffiti stroke yet");
-    }
-    else
-    {
-      println("handle_force: No such index " + identifier);
-    }
+    println("No such index " + identifier);
     return;
-    //identifier = 0; // FIXME: so that we support old legacy cannette Arduino code.
   }
   GraffitiInfo graffiti = graffitis.get(identifier);
   if (debug)
@@ -282,9 +274,6 @@ void handle_force(int identifier, int force)
   {
     graffiti.force_is_pressed = false;
   }
-  
-  // FIXME: I don't think this belongs here.
-  //create_points_if_needed();
 }
 
 
@@ -398,16 +387,15 @@ void create_points_if_needed()
     GraffitiInfo graffiti = graffitis.get(MOUSE_GRAFFITI_IDENTIFIER);
     graffiti.graffiti_add_knot_to_stroke(mouseX, mouseY, graffiti.brush_weight);
   }
-  
   for (int i = 0; i < graffitis.size(); i++)
   {
     GraffitiInfo graffiti = graffitis.get(i);
     // Start pressing:
-    if ((! graffiti.force_was_pressed) && graffiti.force_is_pressed)
-    {
+    if ((! graffiti.stroking) && graffiti.force_is_pressed)
+    {      
       if (debug)
       {
-        println("begin at " + graffiti.blob_x + " " + graffiti.blob_y);
+        println("begin");
       }
       // TODO: use blob_size and force to calculate brush_weight
       graffiti.graffiti_start_stroke(
@@ -416,7 +404,7 @@ void create_points_if_needed()
               (int) graffiti.brush_weight);
     }
     // continue to press:
-    else if (graffiti.force_was_pressed && graffiti.force_is_pressed)
+    else if (graffiti.stroking && graffiti.force_is_pressed)
     {
       // TODO: use blob_size and force to calculate brush_weight
       graffiti.graffiti_add_knot_to_stroke(
@@ -425,19 +413,19 @@ void create_points_if_needed()
               (int) graffiti.brush_weight);
     }
     // stop pressing:
-    else if (graffiti.force_was_pressed && (! graffiti.force_is_pressed))
+    else if (graffiti.stroking && ! graffiti.force_is_pressed)
     {
-      graffiti.force_was_pressed = false;
-      graffiti.force_is_pressed = false;
+      graffiti.graffiti_end_stroke(
+              (int) graffiti.blob_x,
+              (int) graffiti.blob_y,
+              (int) graffiti.brush_weight);
       if (debug)
       {
-        //println("end");
-        println("end at " + graffiti.blob_x + " " + graffiti.blob_y);
+        println("end");
       }
       // spray_end();
       undo.takeSnapshot(paintscreen);
     }
-    graffiti.force_was_pressed = graffiti.force_is_pressed;
   }
 }
 
@@ -450,11 +438,11 @@ void create_points_if_needed()
 void oscEvent(OscMessage message)
 {
   int identifier = 0;
-  //print("Received " + message.addrPattern() + " " + message.typetag() + "\n");
+  print("Received " + message.addrPattern() + " " + message.typetag() + "\n");
   if (message.checkAddrPattern("/force"))
   {
     // TODO: parse string identifier as a first OSC argument
-    int force = 0;
+    int force = 0;    
     if (message.checkTypetag("ii"))
     {
       identifier = message.get(0).intValue();
@@ -472,6 +460,7 @@ void oscEvent(OscMessage message)
       // not anymore
     }
     handle_force(identifier, force);
+    println("wertewrtwer");
   }
   else if (message.checkAddrPattern("/blob"))
   {

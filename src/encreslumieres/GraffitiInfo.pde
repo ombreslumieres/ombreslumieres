@@ -11,10 +11,11 @@ class GraffitiInfo
   public int spray_x = 0;
   public int spray_y = 0;
   public boolean force_is_pressed = false;
+  public boolean force_was_pressed = false; // deprecated?
   public float blob_x = 0.0;
   public float blob_y = 0.0;
   public float blob_size = 0.0;
-  public boolean force_was_pressed = false;
+  public boolean stroking = false;
 
   GraffitiInfo()
   {
@@ -27,6 +28,15 @@ class GraffitiInfo
   void graffiti_start_stroke(int x, int y, float the_weight)
   {
     this.spray_can.newStroke(x, y, the_weight);
+    this.stroking = true;
+  }
+  
+  /**
+   * Ends a graffiti stroke.
+   */
+  void graffiti_end_stroke(int x, int y, float the_weight)
+  {
+    this.stroking = false;
   }
   
   /**
