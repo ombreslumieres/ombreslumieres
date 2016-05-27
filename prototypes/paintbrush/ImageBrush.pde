@@ -4,6 +4,7 @@ class ImageBrush extends Brush
   
   public ImageBrush()
   {
+    super();
     this._image = null;
   }
   

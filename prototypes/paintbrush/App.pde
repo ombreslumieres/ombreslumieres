@@ -4,7 +4,6 @@ import oscP5.OscP5;
 
 
 final String VERSION = "0.2.1";
-final String BACKGROUND_IMAGE_NAME = "background.png";
 
 
 class App
@@ -14,6 +13,9 @@ class App
   private final String OSC_SEND_HOST = "127.0.0.1";
   private final int BLOB_INPUT_WIDTH = 640;
   private final int BLOB_INPUT_HEIGHT = 480;
+  private final int NUM_SPRAY_CANS = 10;
+  private final int MOUSE_GRAFFITI_IDENTIFIER = 0;
+  private final String BACKGROUND_IMAGE_NAME = "background.png";
 
   // private attributes
   private boolean _verbose = false;
@@ -25,6 +27,7 @@ class App
   PImage _background_image;
   OscP5 _osc_receiver;
   NetAddress _osc_send_address;
+  ArrayList<SprayCan> _spray_cans;
 
   /**
    * Constructor.
@@ -34,6 +37,16 @@ class App
     this._test_brush = new ImageBrush();
     ((ImageBrush) this._test_brush).load_image("brush_A_1.png");
     this._background_image = loadImage(BACKGROUND_IMAGE_NAME);
+
+    this._spray_cans = new ArrayList<SprayCan>();
+    for (int i = 0; i < this.NUM_SPRAY_CANS; i++)
+    {
+      SprayCan item = new SprayCan(width, height); // FIXME using global vars here.
+      item.set_color(color(255, 127, 63, 127)); // default color is 50% orange
+      item.set_brush_size(64); // default brush size is 54
+      item.set_current_brush(this._test_brush);
+      this._spray_cans.add(item);
+    }
   }
 
   public void set_verbose(boolean value)
@@ -64,7 +77,17 @@ class App
   {
     background(0);
     image(this._background_image, 0, 0);
-    image(this._test_buffer, 0, 0);
+    this.create_points_if_needed();
+
+    for (int i = 0; i < this._spray_cans.size(); i++)
+    {
+      // TODO: draw each spray can layer separately
+      this._spray_cans.get(i).draw_spraycan();
+    }
+    for (int i = 0; i < this._spray_cans.size(); i++)
+    {
+      this._spray_cans.get(i).draw_cursor();
+    }
   }
 
   private void log_debug(String message)
@@ -82,13 +105,13 @@ class App
 
   public void mousePressed_cb(float mouse_x, float mouse_y)
   {
-    this._test_buffer.beginDraw();
-    this._test_brush.draw_brush(this._test_buffer, mouse_x, mouse_y, 64, color(255, 127, 0, 127)); // FIXME
-    this._test_buffer.endDraw();
+    SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
+    spray_can.start_new_stroke(mouse_x, mouse_y);
   }
 
   public void mouseReleased_cb(float mouse_x, float mouse_y)
   {
+    // TODO: record on the undo stack
   }
 
   public void keyPressed_cb()
@@ -154,7 +177,25 @@ class App
   {
     // TODO
   }
-  
+
+  /**
+   * Does the job of creating the points in the stroke, if we received OSC messages.
+   */
+  private void create_points_if_needed()
+  {
+    if (mousePressed)
+    {
+      SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
+      spray_can.add_node(mouseX, mouseY); // FIXME
+    }
+
+    for (int i = 0; i < _spray_cans.size(); i++)
+    {
+      SprayCan spray_can = _spray_cans.get(i);
+      // TODO
+    }
+  }
+
   /**
    * Incoming osc message are forwarded to the oscEvent method.
    *
