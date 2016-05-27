@@ -23,29 +23,62 @@ class App
   private int _width = 640; // window width
   private int _height = 480; // window height
   private PGraphics _test_buffer = null;
-  private Brush _test_brush;
   PImage _background_image;
   OscP5 _osc_receiver;
   NetAddress _osc_send_address;
   ArrayList<SprayCan> _spray_cans;
+  ArrayList<Brush> _brushes;
 
   /**
    * Constructor.
    */
   public App()
   {
-    this._test_brush = new ImageBrush();
-    ((ImageBrush) this._test_brush).load_image("brush_A_1.png");
+    this._brushes = new ArrayList<Brush>();
+    this._load_brushes();
     this._background_image = loadImage(BACKGROUND_IMAGE_NAME);
 
     this._spray_cans = new ArrayList<SprayCan>();
     for (int i = 0; i < this.NUM_SPRAY_CANS; i++)
     {
       SprayCan item = new SprayCan(width, height); // FIXME using global vars here.
-      item.set_color(color(255, 127, 63, 127)); // default color is 50% orange
+      item.set_color(color(255, 127, 63, 255)); // default color is orange
       item.set_brush_size(32); // default brush size
-      item.set_current_brush(this._test_brush);
+      item.set_current_brush(this._brushes.get(0));
       this._spray_cans.add(item);
+    }
+  }
+  
+  private void _load_brushes()
+  {
+    Brush point_shader_brush = new PointShaderBrush();
+    this._brushes.add(point_shader_brush);
+    
+    Brush image_brush = new ImageBrush();
+    ((ImageBrush) image_brush).load_image("brush_A_1.png");
+    this._brushes.add(image_brush);
+  }
+  
+  public boolean choose_brush(int spray_can_index, int brush_index)
+  {
+    // TODO: test this
+    if (spray_can_index < this.NUM_SPRAY_CANS)
+    {
+      if (brush_index >= this._brushes.size())
+      {
+        println("Warning: no such brush index: " + brush_index); 
+        return false;
+      }
+      else
+      {
+        this._spray_cans.get(spray_can_index).set_current_brush(this._brushes.get(brush_index));
+        return true;
+      }
+    }
+    else
+    {
+      println("Warning: no such spray can index: " + spray_can_index); 
+      return false;
     }
   }
 
