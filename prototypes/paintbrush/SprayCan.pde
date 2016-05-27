@@ -92,6 +92,14 @@ class SprayCan
   {  
     this.start_new_stroke(x, y, this._brush_size);
   }
+  
+  public void start_new_stroke()
+  {  
+    Stroke stroke = new Stroke();
+    stroke.set_step_size(this._default_step_size);
+    stroke.set_brush(this._current_brush);
+    this._strokes.add(stroke);
+  }
 
   /**
    * Adds a node the the current stroke.
