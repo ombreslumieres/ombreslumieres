@@ -29,7 +29,7 @@ class StackOfImages
   
   public void capture(PGraphics screen)
   {
-    this.img[this._current] = screen.get();
+    this._img[this._current] = screen.get();
   }
   
   public void show(PGraphics screen)

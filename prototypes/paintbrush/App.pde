@@ -3,7 +3,7 @@ import oscP5.OscMessage;
 import oscP5.OscP5;
 
 
-final String VERSION = "0.2.1";
+final String VERSION = "0.3.0";
 
 
 class App
@@ -16,6 +16,17 @@ class App
   private final int NUM_SPRAY_CANS = 10;
   private final int MOUSE_GRAFFITI_IDENTIFIER = 0;
   private final String BACKGROUND_IMAGE_NAME = "background.png";
+  /*
+   * Now, the /force we receive from the Arduino over wifi is 
+   * within the range [0,1023] and we invert the number, so that
+   * if we received, 100, example, we will turn it here into
+   * 1023 - 100, which results in 923. Now we will compare it to
+   * a threshold, for example 400. If that inverted force is over
+   * 400, the brush will be on. FORCE_THRESHOLD is what you will
+   * need to change often. See below.
+   */
+  final int FORCE_MAX = 1023; // DO NOT change this
+  final int FORCE_THRESHOLD = 150; // you will need to change this. Used to be 623, then 200
 
   // private attributes
   private boolean _verbose = false;
@@ -28,13 +39,17 @@ class App
   NetAddress _osc_send_address;
   ArrayList<SprayCan> _spray_cans;
   ArrayList<Brush> _brushes;
+  ArrayList<Command> _commands;
 
   /**
    * Constructor.
+   * 
+   * See this.setup_cb() for more initialization. (OSC receiver, etc.)
    */
   public App()
   {
     this._brushes = new ArrayList<Brush>();
+    this._commands = new ArrayList<Command>();
     this._load_brushes();
     this._background_image = loadImage(BACKGROUND_IMAGE_NAME);
 
@@ -46,6 +61,42 @@ class App
       item.set_brush_size(32); // default brush size
       item.set_current_brush(this._brushes.get(0));
       this._spray_cans.add(item);
+    }
+    
+    // XXX See this.setup_cb() for more initialization. (OSC receiver, etc.)
+  }
+  
+  private synchronized void _push_command(Command command)
+  {
+    this._commands.add(command);
+  }
+  
+  private synchronized Command _pop_command()
+  {
+    Command ret = null;
+    if (this._commands.size() > 0)
+    {
+      int index = this._commands.size() - 1;
+      ret = this._commands.get(index);
+      this._commands.remove(index);
+    }
+    return ret;
+  }
+  
+  private void _consume_commands()
+  {
+    final int MAX_COMMANDS = 1000;
+    for (int i = 0; i < MAX_COMMANDS; i ++)
+    {
+      Command command = this._pop_command();
+      if (command == null)
+      {
+        break;
+      }
+      else
+      {
+        command.apply(this);
+      }
     }
   }
   
@@ -110,6 +161,14 @@ class App
   {
     background(0);
     image(this._background_image, 0, 0);
+    
+    if (mousePressed)
+    {
+      //SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
+      //spray_can.add_node(mouseX, mouseY); // FIXME
+      this._push_command((Command) new AddNodeCommand(MOUSE_GRAFFITI_IDENTIFIER, mouse_x, mouse_y)); // , float size
+    }
+    this._consume_commands();
     this.create_points_if_needed();
 
     for (int i = 0; i < this._spray_cans.size(); i++)
@@ -138,13 +197,15 @@ class App
 
   public void mousePressed_cb(float mouse_x, float mouse_y)
   {
-    SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
-    spray_can.start_new_stroke(mouse_x, mouse_y);
+    //SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
+    //spray_can.start_new_stroke(mouse_x, mouse_y);
+    this._push_command((Command) new NewStrokeCommand(MOUSE_GRAFFITI_IDENTIFIER));
   }
 
   public void mouseReleased_cb(float mouse_x, float mouse_y)
   {
     // TODO: record on the undo stack
+    // add EndStrokeCommand
   }
 
   public void keyPressed_cb()
@@ -154,7 +215,7 @@ class App
   /**
    * Convert a X coordinate from blob range to display range.
    */
-  float map_x(float value)
+  private float map_x(float value)
   {
     return map(value, 0.0, BLOB_INPUT_WIDTH, 0.0, this._width);
   }
@@ -162,7 +223,7 @@ class App
   /**
    * Convert a Y coordinate from blob range to display range.
    */
-  float map_y(float value)
+  private float map_y(float value)
   {
     float height_3_4 = this._width * (3.0 / 4.0);
     return map(value, 0.0, BLOB_INPUT_HEIGHT, 0.0, height_3_4);
@@ -171,7 +232,7 @@ class App
   /**
    * Handles /color OSC messages.
    */
-  void handle_color(int identifier, int r, int g, int b)
+  private void handle_color(int spray_can_index, int r, int g, int b)
   {
     // TODO
   }
@@ -179,7 +240,7 @@ class App
   /**
    * Handles /brush/weight OSC messages.
    */
-  void handle_brush_weight(int identifier, int weight)
+  private void handle_brush_weight(int spray_can_index, int weight)
   {
     // TODO
   }
@@ -187,7 +248,7 @@ class App
   /**
    * Handles /blob OSC messages.
    */
-  void handle_blob(int identifier, float x, float y, float size)
+  private void handle_blob(int spray_can_index, float x, float y, float size)
   {
     // TODO
   }
@@ -195,18 +256,23 @@ class App
   /**
    * Handles /force OSC messages.
    */
-  void handle_force(int identifier, int force)
+  private void handle_force(int spray_can_index, int force)
   {
     // TODO
   }
 
-  void handle_redo()
+  /**
+   * Handles redo OSC messages.
+   */
+  private void handle_redo(int spray_can_index)
   {
     // TODO
   }
 
-
-  void handle_undo()
+  /**
+   * Handles undo OSC messages.
+   */
+  private void handle_undo(int spray_can_index)
   {
     // TODO
   }
@@ -222,17 +288,19 @@ class App
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.start_new_stroke();
   }
+  
+  
 
   /**
    * Does the job of creating the points in the stroke, if we received OSC messages.
    */
   private void create_points_if_needed()
   {
-    if (mousePressed)
-    {
-      SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
-      spray_can.add_node(mouseX, mouseY); // FIXME
-    }
+    //if (mousePressed)
+    //{
+    //  SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
+    //  spray_can.add_node(mouseX, mouseY); // FIXME
+    //}
 
     for (int i = 0; i < _spray_cans.size(); i++)
     {
@@ -246,7 +314,7 @@ class App
    *
    * The name of this method is set up by the oscP5 library.
    */
-  void oscEvent(OscMessage message)
+  public void oscEvent(OscMessage message)
   {
     int identifier = 0;
     //print("Received " + message.addrPattern() + " " + message.typetag() + "\n");
@@ -346,13 +414,21 @@ class App
     // ---  /undo ---
     else if (message.checkAddrPattern("/undo"))
     {
-      handle_undo();
+      if (message.checkTypetag("i"))
+      {
+        identifier = message.get(0).intValue();
+        this.handle_undo(identifier);
+      }
     }
     
     // ---  /redo ---
     else if (message.checkAddrPattern("/redo"))
     {
-      handle_redo();
+      if (message.checkTypetag("i"))
+      {
+        identifier = message.get(0).intValue();
+        this.handle_redo(identifier);
+      }
     }
   }
 }

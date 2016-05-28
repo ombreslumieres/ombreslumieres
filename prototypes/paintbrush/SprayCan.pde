@@ -6,6 +6,7 @@ class SprayCan
   // constants
   private final float DEFAULT_STEP_SIZE = 5.0;
   private final float DEFAULT_BRUSH_SIZE = 64;
+  private final float BRUSH_SCALE = 0.3; // FIXME: what is this?
   
   // attributes
   private ArrayList<Stroke> _strokes;
@@ -23,7 +24,8 @@ class SprayCan
   //private float _blob_x = 0.0;
   //private float _blob_y = 0.0;
   //private float _blob_size = 0.0;
-
+  private float _cursor_x = 0.0;
+  private float _cursor_y = 0.0;
 
   public SprayCan(int image_width, int image_height)
   {
@@ -60,6 +62,15 @@ class SprayCan
   public void draw_cursor()
   {
     // TODO
+    pushStyle();
+    noFill();
+    strokeWeight(1.0);
+    stroke(255, 0, 0);
+    float ellipse_size = this._brush_size * BRUSH_SCALE;
+    float cursor_x = this._cursor_x;
+    float cursor_y = this._cursor_y;
+    ellipse(cursor_x, cursor_y, ellipse_size, ellipse_size);
+    popStyle();
   }
 
   /*

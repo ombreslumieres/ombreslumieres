@@ -122,6 +122,11 @@ class Stroke
     }
     else
     {
+      if (this._nodes == null)
+      {
+        println("No node to draw in draw_stroke");
+        return false;
+      }
       for (Node p: this._nodes)
       {
         // draws each node only once, on the pixel buffer

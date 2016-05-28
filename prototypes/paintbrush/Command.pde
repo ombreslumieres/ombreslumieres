@@ -30,6 +30,14 @@ public class AddNodeCommand extends Command
       this._size = size;
     }
     
+    public AddNodeCommand(int spray_can_index, float x, float y)
+    {
+      super(spray_can_index);
+      this._x = x;
+      this._y = y;
+      this._size =  64.0; // FIXME
+    }
+    
     public final void apply(App app)
     {
       app.apply_add_node(this.get_spray_can_index(), this._x, this._y); // TODO , this._size);
@@ -39,6 +47,18 @@ public class AddNodeCommand extends Command
 
 public class NewStrokeCommand extends Command
 {
+    private float _x = -1.0;
+    private float _y = -1.0;
+    private float _size = -1.0;
+    
+    public NewStrokeCommand(int spray_can_index, float x, float y, float size)
+    {
+      super(spray_can_index);
+      this._x = x;
+      this._y = y;
+      this._size = size;
+    }
+    
     public NewStrokeCommand(int spray_can_index)
     {
       super(spray_can_index);
@@ -46,7 +66,14 @@ public class NewStrokeCommand extends Command
     
     public final void apply(App app)
     {
-      app.apply_new_stroke(this.get_spray_can_index());
+      if (this._x == -1)
+      {
+        app.apply_new_stroke(this.get_spray_can_index());
+      }
+      else
+      {
+        //TODO app.apply_new_stroke(this.get_spray_can_index(), this._x, this._y, this._size);
+      }
     }
 }
 
