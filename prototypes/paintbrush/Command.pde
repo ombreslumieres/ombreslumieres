@@ -59,6 +59,13 @@ public class NewStrokeCommand extends Command
       this._size = size;
     }
     
+    public NewStrokeCommand(int spray_can_index, float x, float y)
+    {
+      super(spray_can_index);
+      this._x = x;
+      this._y = y;
+    }
+    
     public NewStrokeCommand(int spray_can_index)
     {
       super(spray_can_index);
@@ -66,13 +73,17 @@ public class NewStrokeCommand extends Command
     
     public final void apply(App app)
     {
-      if (this._x == -1)
+      if (this._x == -1.0)
       {
         app.apply_new_stroke(this.get_spray_can_index());
       }
+      else if (this._size == -1.0)
+      {
+        app.apply_new_stroke(this.get_spray_can_index(), this._x, this._y);
+      }
       else
       {
-        //TODO app.apply_new_stroke(this.get_spray_can_index(), this._x, this._y, this._size);
+        app.apply_new_stroke(this.get_spray_can_index(), this._x, this._y, this._size);
       }
     }
 }

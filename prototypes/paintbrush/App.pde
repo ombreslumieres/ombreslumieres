@@ -289,7 +289,17 @@ class App
     spray_can.start_new_stroke();
   }
   
+  public void apply_new_stroke(int spray_can_index, float x, float y)
+  {
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    spray_can.start_new_stroke(x, y);
+  }
   
+  public void apply_new_stroke(int spray_can_index, float x, float y, float size)
+  {
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    spray_can.start_new_stroke(x, y, size);
+  }
 
   /**
    * Does the job of creating the points in the stroke, if we received OSC messages.
