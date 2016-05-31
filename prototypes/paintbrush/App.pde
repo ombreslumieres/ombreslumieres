@@ -310,7 +310,7 @@ class App
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
       float mapped_x = this.map_x(x);
       float mapped_y = this.map_y(y);
-      spray_can.set_cursor_x_y_size(x, y, size);
+      spray_can.set_cursor_x_y_size(mapped_x, mapped_y, size);
       if (spray_can.get_is_spraying())
       {
         this._push_command((Command)
@@ -356,6 +356,7 @@ class App
       }
       boolean is_pressed = this._force_to_is_pressed(force);
       boolean was_pressed = spray_can.get_is_spraying();
+      spray_can.set_is_spraying(is_pressed);
       if (! was_pressed && is_pressed)
       {
         if (this.debug_force)
