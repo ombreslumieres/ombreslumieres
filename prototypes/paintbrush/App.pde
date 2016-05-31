@@ -311,6 +311,11 @@ class App
       float mapped_x = this.map_x(x);
       float mapped_y = this.map_y(y);
       spray_can.set_cursor_x_y_size(x, y, size);
+      if (spray_can.get_is_spraying())
+      {
+        this._push_command((Command)
+            new AddNodeCommand(spray_can_index, mapped_x, mapped_y, size));
+      }
     }
     else
     {
@@ -503,7 +508,14 @@ class App
       int g = 255;
       int b = 255;
       int a = 255;
-      if (message.checkTypetag("iiiii"))
+      if (message.checkTypetag("iiii"))
+      {
+        identifier = message.get(0).intValue();
+        r = message.get(1).intValue();
+        g = message.get(2).intValue();
+        b = message.get(3).intValue();
+      }
+      else if (message.checkTypetag("iiiii"))
       {
         identifier = message.get(0).intValue();
         r = message.get(1).intValue();
