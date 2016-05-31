@@ -582,5 +582,12 @@ class App
         this.handle_redo(identifier);
       }
     }
+    
+    // fallback
+    else
+    {
+      println("Unknown OSC message.");
+    }
+    
   }
 }
