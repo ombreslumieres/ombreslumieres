@@ -41,6 +41,7 @@ class App
   ArrayList<Brush> _brushes;
   ArrayList<Command> _commands;
   boolean _mouse_is_pressed = false;
+  boolean debug_force = false;
 
   /**
    * Constructor.
@@ -243,11 +244,13 @@ class App
   /**
    * Handles /color OSC messages.
    */
-  private void handle_color(int spray_can_index, int r, int g, int b)
+  private void handle_color(int spray_can_index, int r, int g, int b, int a)
   {
     // TODO
     if (this.has_can_index(spray_can_index))
     {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      spray_can.set_color(color(r, g, b, a));
     }
     else
     {
@@ -265,6 +268,31 @@ class App
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
       spray_can.set_brush_weight(weight);
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
+  }
+  
+  /**
+   * Handles /brush/choice OSC messages.
+   */
+  private void handle_brush_choice(int spray_can_index, int brush_index)
+  {
+    // TODO
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      if (brush_index >= this._brushes.size())
+      {
+        println("no such brush index " + brush_index);
+      }
+      else
+      {
+        Brush brush = this._brushes.get(brush_index);
+        spray_can.set_current_brush(brush);
+      }
     }
     else
     {
@@ -289,6 +317,24 @@ class App
       println("No such can index " + spray_can_index);
     }
   }
+  
+  private boolean _force_to_is_pressed(int force)
+  {
+    boolean ret = false;
+    // Invert the number
+    force = FORCE_MAX - force;
+    if (force > FORCE_THRESHOLD)
+    {
+      ret = true;
+    }
+    return ret;
+  }
+  
+  private float _force_to_weight(float value)
+  {
+    // TODO
+    return 0.0;
+  }
 
   /**
    * Handles /force OSC messages.
@@ -299,6 +345,21 @@ class App
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      if (this.debug_force)
+      {
+        println("FORCE: " + force);
+      }
+      boolean is_pressed = this._force_to_is_pressed(force);
+      boolean was_pressed = spray_can.get_is_spraying();
+      if (! was_pressed && is_pressed)
+      {
+        if (this.debug_force)
+        {
+          println("FORCE: NEW STROKE");
+        }
+        this._push_command((Command)
+            new NewStrokeCommand(spray_can_index)); // TODO: should we already create the first node, for faster response?
+      }
     }
     else
     {
@@ -315,6 +376,7 @@ class App
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      println("TODO: redo");
     }
     else
     {
@@ -330,6 +392,7 @@ class App
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      println("TODO: undo");
     }
     else
     {
@@ -439,25 +502,28 @@ class App
       int r = 255;
       int g = 255;
       int b = 255;
-      if (message.checkTypetag("iiii"))
+      int a = 255;
+      if (message.checkTypetag("iiiii"))
       {
         identifier = message.get(0).intValue();
         r = message.get(1).intValue();
         g = message.get(2).intValue();
         b = message.get(3).intValue();
+        a = message.get(4).intValue();
       }
-      else if (message.checkTypetag("ifff"))
+      else if (message.checkTypetag("iffff"))
       {
         identifier = message.get(0).intValue();
         r = (int) message.get(1).floatValue();
         g = (int) message.get(2).floatValue();
         b = (int) message.get(3).floatValue();
+        a = (int) message.get(4).floatValue();
       }
       else
       {
         println("Wrong OSC typetags for /color.");
       }
-      this.handle_color(identifier, r, g, b);
+      this.handle_color(identifier, r, g, b, a);
     }
     
     // ---  /brush/weight ---
@@ -479,6 +545,22 @@ class App
         println("Wrong OSC typetags for /brush/weight.");
       }
       this.handle_brush_weight(identifier, weight);
+    }
+    
+    // ---  /brush/choice ---
+    else if (message.checkAddrPattern("/brush/choice"))
+    {
+      int brush_choice = 0;
+      if (message.checkTypetag("ii"))
+      {
+        identifier = message.get(0).intValue();
+        brush_choice = message.get(1).intValue();
+      }
+      else
+      {
+        println("Wrong OSC typetags for /brush/choice.");
+      }
+      this.handle_brush_choice(identifier, brush_choice);
     }
     
     // ---  /undo ---

@@ -28,6 +28,7 @@ class SprayCan
   private float _cursor_x = 0.0;
   private float _cursor_y = 0.0;
   private float _cursor_size = 0.0;
+  private boolean _is_spraying = false;
 
   public SprayCan(int image_width, int image_height)
   {
@@ -38,6 +39,16 @@ class SprayCan
     this._image_width = image_width;
     this._image_height = image_height;
     this._buffer = createGraphics(this._image_width, this._image_height, P3D);
+  }
+
+  void set_is_spraying(boolean value)
+  {
+    this._is_spraying = value;
+  }
+  
+  boolean get_is_spraying()
+  {
+    return this._is_spraying;
   }
 
   void set_current_brush(Brush brush)

@@ -124,7 +124,7 @@ class Stroke
     {
       if (this._nodes == null)
       {
-        println("No node to draw in draw_stroke");
+        //println("No node to draw in draw_stroke");
         return false;
       }
       for (Node p: this._nodes)
