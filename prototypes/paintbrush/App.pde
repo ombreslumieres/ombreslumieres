@@ -17,7 +17,7 @@ class App
   private final int MOUSE_GRAFFITI_IDENTIFIER = 0;
   private final String BACKGROUND_IMAGE_NAME = "background.png";
   /*
-   * Now, the /force we receive from the Arduino over wifi is 
+   * Now, the /force we receive from the Arduino over wifi is
    * within the range [0,1023] and we invert the number, so that
    * if we received, 100, example, we will turn it here into
    * 1023 - 100, which results in 923. Now we will compare it to
@@ -41,9 +41,11 @@ class App
   ArrayList<Brush> _brushes;
   ArrayList<Command> _commands;
 
+  boolean mouseIsPressed = false;
+
   /**
    * Constructor.
-   * 
+   *
    * See this.setup_cb() for more initialization. (OSC receiver, etc.)
    */
   public App()
@@ -62,27 +64,27 @@ class App
       item.set_current_brush(this._brushes.get(0));
       this._spray_cans.add(item);
     }
-    
+
     // XXX See this.setup_cb() for more initialization. (OSC receiver, etc.)
   }
-  
+
   private synchronized void _push_command(Command command)
   {
     this._commands.add(command);
   }
-  
+
   private synchronized Command _pop_command()
   {
     Command ret = null;
     if (this._commands.size() > 0)
     {
       int index = this._commands.size() - 1;
-      ret = this._commands.get(index);
-      this._commands.remove(index);
+      ret = this._commands.get(0);
+      this._commands.remove(0);
     }
     return ret;
   }
-  
+
   private void _consume_commands()
   {
     final int MAX_COMMANDS = 1000;
@@ -99,17 +101,17 @@ class App
       }
     }
   }
-  
+
   private void _load_brushes()
   {
-    Brush point_shader_brush = new PointShaderBrush();
-    this._brushes.add(point_shader_brush);
-    
     Brush image_brush = new ImageBrush();
     ((ImageBrush) image_brush).load_image("brush_A_1.png");
     this._brushes.add(image_brush);
+
+    Brush point_shader_brush = new PointShaderBrush();
+    this._brushes.add(point_shader_brush);
   }
-  
+
   public boolean choose_brush(int spray_can_index, int brush_index)
   {
     // TODO: test this
@@ -117,7 +119,7 @@ class App
     {
       if (brush_index >= this._brushes.size())
       {
-        println("Warning: no such brush index: " + brush_index); 
+        println("Warning: no such brush index: " + brush_index);
         return false;
       }
       else
@@ -128,7 +130,7 @@ class App
     }
     else
     {
-      println("Warning: no such spray can index: " + spray_can_index); 
+      println("Warning: no such spray can index: " + spray_can_index);
       return false;
     }
   }
@@ -161,8 +163,8 @@ class App
   {
     background(0);
     image(this._background_image, 0, 0);
-    
-    if (mousePressed)
+
+    if (mouseIsPressed)
     {
       //SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
       //spray_can.add_node(mouseX, mouseY); // FIXME
@@ -170,16 +172,17 @@ class App
     }
     this._consume_commands();
     this.create_points_if_needed();
-
-    for (int i = 0; i < this._spray_cans.size(); i++)
-    {
-      // TODO: draw each spray can layer separately
-      this._spray_cans.get(i).draw_spraycan();
-    }
+    this.draw_all_layers();
     for (int i = 0; i < this._spray_cans.size(); i++)
     {
       this._spray_cans.get(i).draw_cursor();
     }
+  }
+
+  private void draw_all_layers(){
+    int layer_count = this._spray_cans.get(0).get_layer_count();
+    for (int i = 0; i < layer_count; i++)
+      for(SprayCan sc : this._spray_cans) sc.draw_layer(i);
   }
 
   private void log_debug(String message)
@@ -200,12 +203,15 @@ class App
     //SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
     //spray_can.start_new_stroke(mouse_x, mouse_y);
     this._push_command((Command) new NewStrokeCommand(MOUSE_GRAFFITI_IDENTIFIER));
+    this.mouseIsPressed = true;
   }
 
   public void mouseReleased_cb(float mouse_x, float mouse_y)
   {
     // TODO: record on the undo stack
     // add EndStrokeCommand
+    this.mouseIsPressed = false;
+
   }
 
   public void keyPressed_cb()
@@ -276,20 +282,20 @@ class App
   {
     // TODO
   }
-  
+
   public void apply_add_node(int spray_can_index, float x, float y) // , float size)
   {
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.add_node(x, y);
   }
-  
+
   public void apply_new_stroke(int spray_can_index)
   {
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.start_new_stroke();
   }
-  
-  
+
+
 
   /**
    * Does the job of creating the points in the stroke, if we received OSC messages.
@@ -318,7 +324,7 @@ class App
   {
     int identifier = 0;
     //print("Received " + message.addrPattern() + " " + message.typetag() + "\n");
-    
+
     // ---  /force ---
     if (message.checkAddrPattern("/force"))
     {
@@ -342,7 +348,7 @@ class App
       }
       handle_force(identifier, force);
     }
-    
+
     // ---  /blob ---
     else if (message.checkAddrPattern("/blob"))
     {
@@ -362,7 +368,7 @@ class App
       }
       handle_blob(identifier, x, y, size);
     }
-    
+
     // ---  /color ---
     else if (message.checkAddrPattern("/color"))
     {
@@ -389,7 +395,7 @@ class App
       }
       handle_color(identifier, r, g, b);
     }
-    
+
     // ---  /brush/weight ---
     else if (message.checkAddrPattern("/brush/weight"))
     {
@@ -410,7 +416,7 @@ class App
       }
       handle_brush_weight(identifier, weight);
     }
-    
+
     // ---  /undo ---
     else if (message.checkAddrPattern("/undo"))
     {
@@ -420,7 +426,7 @@ class App
         this.handle_undo(identifier);
       }
     }
-    
+
     // ---  /redo ---
     else if (message.checkAddrPattern("/redo"))
     {

@@ -7,16 +7,22 @@ class SprayCan
   private final float DEFAULT_STEP_SIZE = 5.0;
   private final float DEFAULT_BRUSH_SIZE = 64;
   private final float BRUSH_SCALE = 0.3; // FIXME: what is this?
-  
+  private final int LAYER_COUNT = 4;
+
+
   // attributes
   private ArrayList<Stroke> _strokes;
   private color _color;
   private float _brush_size;
   private Brush _current_brush;
-  private PGraphics _buffer = null;
   private int _image_width;
   private int _image_height;
   private float _default_step_size;
+
+  // private PGraphics _buffer = null;
+  private ArrayList<PGraphics> _layers;
+  private PGraphics _current_layer;
+
   // TODO: add layers here
   // TODO: add undo here
   //private boolean _force_is_pressed = false;
@@ -35,7 +41,13 @@ class SprayCan
     this._default_step_size = this.DEFAULT_STEP_SIZE;
     this._image_width = image_width;
     this._image_height = image_height;
-    this._buffer = createGraphics(this._image_width, this._image_height, P3D);
+
+    this._layers = new ArrayList<PGraphics>();
+    for(int i = 0; i < this.LAYER_COUNT; i++)
+    {
+      this._layers.add(createGraphics(this._image_width, this._image_height, P3D));
+    }
+    set_current_layer(0);
   }
 
   void set_current_brush(Brush brush)
@@ -43,22 +55,41 @@ class SprayCan
     this._current_brush = brush;
   }
 
+  public void set_current_layer(int index)
+  {
+    PGraphics layer = get_layer(index);
+    if(layer != null) this._current_layer = layer;
+    else return;
+  }
+
+  public PGraphics get_layer(int index)
+  {
+    if(index < _layers.size() && index >= 0)
+      return this._layers.get(index);
+    else return null;
+  }
+
   /**
    * Draws all its strokes.
    * NOTE: nodes are only drawn once.
    */
-  public void draw_spraycan()
+  public void draw_layer(PGraphics layer)
   {
     // TODO: draw each spray can layer separately
-    this._buffer.beginDraw();
+    layer.beginDraw();
     for (Stroke stroke : this._strokes)
     {
-      stroke.draw_stroke(this._buffer); // , shader);
+      stroke.draw_stroke(layer); // , shader);
     }
-    image(this._buffer, 0, 0);
-    this._buffer.endDraw();
+    image(layer, 0, 0);
+    layer.endDraw();
   }
-  
+
+  public void draw_layer(int index){
+    PGraphics layer = get_layer(index);
+    if(layer != null) draw_layer(layer);
+  }
+
   public void draw_cursor()
   {
     // TODO
@@ -83,29 +114,30 @@ class SprayCan
       stroke.clear_stroke();
     }
     this._strokes.clear();
-    // FIXME: we probably need to remove each path in our array list, we is not done here.
-    this._buffer = createGraphics(_image_width, _image_height, P3D);
+    // // FIXME: we probably need to remove each path in our array list, we is not done here.
+    // this._current_layer = createGraphics(_image_width, _image_height, P3D);
+    for(PGraphics pg : this._layers) pg.clear();
   }
 
   /**
    * Starts a stroke.
    */
   public void start_new_stroke(float x, float y, float brush_size)
-  {  
+  {
     Node starting_node = new Node(x, y, brush_size, this._color);
     this._brush_size = brush_size;
     Stroke stroke = new Stroke(starting_node, this._default_step_size);
     stroke.set_brush(this._current_brush);
     this._strokes.add(stroke);
   }
-  
+
   public void start_new_stroke(float x, float y)
-  {  
+  {
     this.start_new_stroke(x, y, this._brush_size);
   }
-  
+
   public void start_new_stroke()
-  {  
+  {
     Stroke stroke = new Stroke();
     stroke.set_step_size(this._default_step_size);
     stroke.set_brush(this._current_brush);
@@ -130,7 +162,7 @@ class SprayCan
       return;
     }
   }
-  
+
   public void add_node(float x, float y)
   {
     this.add_node(x, y, this._brush_size);
@@ -171,5 +203,9 @@ class SprayCan
   public color get_color()
   {
     return this._color;
+  }
+
+  public int get_layer_count(){
+    return LAYER_COUNT;
   }
 }

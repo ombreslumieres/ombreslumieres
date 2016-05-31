@@ -1,5 +1,5 @@
 // XXX comment out next line if not using Syphon
-import codeanticode.syphon.SyphonServer;
+//import codeanticode.syphon.SyphonServer;
 
 
 // constants
@@ -11,14 +11,15 @@ final int OSC_RECEIVE_PORT = 31340;
 // variables
 App app;
 // XXX comment out next line if not using Syphon
-SyphonServer syphon_server;
+//SyphonServer syphon_server;
 
 
 void settings()
 {
-  size(displayWidth, displayHeight, P3D);
+  // size(400, 400, P3D);
+  fullScreen(P3D);
   // XXX comment out next line if not using Syphon
-  PJOGL.profile = 1;
+  //PJOGL.profile = 1;
 }
 
 
@@ -31,7 +32,7 @@ void setup()
   app.set_size(width, height);
   app.setup_cb();
   // XXX comment out next line if not using Syphon
-  syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
+  //syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);
 }
 
 
@@ -39,7 +40,7 @@ void draw()
 {
   app.draw_cb(mouseX, mouseY);
   // XXX comment out next line if not using Syphon
-  syphon_server.sendScreen();
+  //syphon_server.sendScreen();
 }
 
 
