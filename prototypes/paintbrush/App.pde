@@ -40,6 +40,7 @@ class App
   ArrayList<SprayCan> _spray_cans;
   ArrayList<Brush> _brushes;
   ArrayList<Command> _commands;
+  boolean _mouse_is_pressed = false;
 
   /**
    * Constructor.
@@ -76,9 +77,8 @@ class App
     Command ret = null;
     if (this._commands.size() > 0)
     {
-      int index = this._commands.size() - 1;
-      ret = this._commands.get(index);
-      this._commands.remove(index);
+      ret = this._commands.get(0);
+      this._commands.remove(0);
     }
     return ret;
   }
@@ -110,10 +110,15 @@ class App
     this._brushes.add(image_brush);
   }
   
+  public boolean has_can_index(int spray_can_index)
+  {
+    return (0 <= spray_can_index && spray_can_index < this.NUM_SPRAY_CANS);
+  }
+  
   public boolean choose_brush(int spray_can_index, int brush_index)
   {
     // TODO: test this
-    if (spray_can_index < this.NUM_SPRAY_CANS)
+    if (has_can_index(spray_can_index))
     {
       if (brush_index >= this._brushes.size())
       {
@@ -143,6 +148,10 @@ class App
     this._osc_receive_port = value;
   }
 
+  /**
+   * Sets the size of the canvas. 
+   * Called from the main sketch file.
+   */
   public void set_size(int size_width, int size_height)
   {
     this._width = size_width;
@@ -162,7 +171,7 @@ class App
     background(0);
     image(this._background_image, 0, 0);
     
-    if (mousePressed)
+    if (this._mouse_is_pressed)
     {
       //SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
       //spray_can.add_node(mouseX, mouseY); // FIXME
@@ -200,12 +209,14 @@ class App
     //SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
     //spray_can.start_new_stroke(mouse_x, mouse_y);
     this._push_command((Command) new NewStrokeCommand(MOUSE_GRAFFITI_IDENTIFIER));
+    this._mouse_is_pressed = true;
   }
 
   public void mouseReleased_cb(float mouse_x, float mouse_y)
   {
     // TODO: record on the undo stack
     // add EndStrokeCommand
+    this._mouse_is_pressed = false;
   }
 
   public void keyPressed_cb()
@@ -235,6 +246,13 @@ class App
   private void handle_color(int spray_can_index, int r, int g, int b)
   {
     // TODO
+    if (this.has_can_index(spray_can_index))
+    {
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
   }
 
   /**
@@ -243,6 +261,15 @@ class App
   private void handle_brush_weight(int spray_can_index, int weight)
   {
     // TODO
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      spray_can.set_brush_weight(weight);
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
   }
 
   /**
@@ -250,7 +277,17 @@ class App
    */
   private void handle_blob(int spray_can_index, float x, float y, float size)
   {
-    // TODO
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      float mapped_x = this.map_x(x);
+      float mapped_y = this.map_y(y);
+      spray_can.set_cursor_x_y_size(x, y, size);
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
   }
 
   /**
@@ -259,6 +296,14 @@ class App
   private void handle_force(int spray_can_index, int force)
   {
     // TODO
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
   }
 
   /**
@@ -267,6 +312,14 @@ class App
   private void handle_redo(int spray_can_index)
   {
     // TODO
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
   }
 
   /**
@@ -274,7 +327,14 @@ class App
    */
   private void handle_undo(int spray_can_index)
   {
-    // TODO
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
   }
   
   public void apply_add_node(int spray_can_index, float x, float y) // , float size)
@@ -350,7 +410,7 @@ class App
         // we use to support only the value - no identifier, but
         // not anymore
       }
-      handle_force(identifier, force);
+      this.handle_force(identifier, force);
     }
     
     // ---  /blob ---
@@ -370,7 +430,7 @@ class App
       {
         println("Wrong OSC typetags for /blob.");
       }
-      handle_blob(identifier, x, y, size);
+      this.handle_blob(identifier, x, y, size);
     }
     
     // ---  /color ---
@@ -397,7 +457,7 @@ class App
       {
         println("Wrong OSC typetags for /color.");
       }
-      handle_color(identifier, r, g, b);
+      this.handle_color(identifier, r, g, b);
     }
     
     // ---  /brush/weight ---
@@ -418,7 +478,7 @@ class App
       {
         println("Wrong OSC typetags for /brush/weight.");
       }
-      handle_brush_weight(identifier, weight);
+      this.handle_brush_weight(identifier, weight);
     }
     
     // ---  /undo ---

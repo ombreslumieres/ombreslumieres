@@ -11,7 +11,8 @@ class SprayCan
   // attributes
   private ArrayList<Stroke> _strokes;
   private color _color;
-  private float _brush_size;
+  private float _brush_size; // XXX duplicate with _cursor_size
+  private float _brush_weight; // We use this. Set for each can using OSC messages.
   private Brush _current_brush;
   private PGraphics _buffer = null;
   private int _image_width;
@@ -26,6 +27,7 @@ class SprayCan
   //private float _blob_size = 0.0;
   private float _cursor_x = 0.0;
   private float _cursor_y = 0.0;
+  private float _cursor_size = 0.0;
 
   public SprayCan(int image_width, int image_height)
   {
@@ -71,6 +73,28 @@ class SprayCan
     float cursor_y = this._cursor_y;
     ellipse(cursor_x, cursor_y, ellipse_size, ellipse_size);
     popStyle();
+  }
+  
+  public void set_cursor_x_y_size(float x, float y, float size)
+  {
+    this._cursor_x = x;
+    this._cursor_y = y;
+    this._cursor_size = size;
+  }
+  
+  public void set_brush_weight(float value)
+  {
+    this._brush_weight = value;
+  }
+  
+  public float get_cursor_x()
+  {
+    return this._cursor_x;
+  }
+  
+  public float get_cursor_y()
+  {
+    return this._cursor_y;
   }
 
   /*
