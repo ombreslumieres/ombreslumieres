@@ -101,14 +101,34 @@ class App
     }
   }
   
+  private void _add_one_brush(String image_file_name)
+  {
+    Brush image_brush = new ImageBrush();
+    ((ImageBrush) image_brush).load_image(image_file_name);
+    this._brushes.add(image_brush);
+  }
+  
   private void _load_brushes()
   {
     Brush point_shader_brush = new PointShaderBrush();
     this._brushes.add(point_shader_brush);
     
-    Brush image_brush = new ImageBrush();
-    ((ImageBrush) image_brush).load_image("brush_A_1.png");
-    this._brushes.add(image_brush);
+    //Brush image_brush = new ImageBrush();
+    //((ImageBrush) image_brush).load_image("brush_A_1.png");
+    //this._brushes.add(image_brush);
+    
+    this._add_one_brush("01_BizzareSplat_64x64.png");
+    this._add_one_brush("02_DoubleSpot_64x64.png");
+    this._add_one_brush("03_FatLine_64x64.png");
+    this._add_one_brush("04_LargeSplat_64x64.png");
+    this._add_one_brush("05_LargeSplat2_64x64.png");
+    this._add_one_brush("06_MediumSplat_64x64.png");
+    this._add_one_brush("07_ParticuleSpot_64x64.png");
+    this._add_one_brush("08_PlainSpot_64x64.png");
+    this._add_one_brush("09_SideSpot_64x64.png");
+    this._add_one_brush("10_SmallSplat_64x64.png");
+    this._add_one_brush("11_SplatSpot_64x64.png");
+    this._add_one_brush("12_SpotSplat_64x64.png");
   }
   
   public boolean has_can_index(int spray_can_index)
