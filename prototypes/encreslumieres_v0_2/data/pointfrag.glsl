@@ -159,7 +159,7 @@ void main()
   float alpha = gradient - noise;
 
   // color of the spray 
-  vec4 color = vec4(vertColor.rgb, alpha * vertColor.a);
+  vec4 color = vec4(vertColor.rgb, alpha);
 
   // Debug (show raw noise)
   // alpha = 1.0 - noise;

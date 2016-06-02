@@ -1,39 +1,44 @@
 class StackOfImages
 {
-  int amount;
-  int current;
-  PImage[] img;
+  private int _amount;
+  private int _current;
+  private PImage[] _img;
   
-  StackOfImages(int amountOfImages, int images_width, int images_height)
+  public StackOfImages(int amountOfImages, int images_width, int images_height)
   {
-    this.amount = amountOfImages;
+    this._amount = amountOfImages;
  
     // Initialize all images as copies of the current display
-    this.img = new PImage[this.amount];
-    for (int i = 0; i < this.amount; i++)
+    this._img = new PImage[this._amount];
+    for (int i = 0; i < this._amount; i++)
     {
-      this.img[i] = createImage(images_width, images_height, RGB);
-      this.img[i] = get();
+      this._img[i] = createImage(images_width, images_height, RGB);
+      this._img[i] = get();
     }
   }
   
-  void next()
+  public void next()
   {
-    this.current = (this.current + 1) % this.amount;
+    this._current = (this._current + 1) % this._amount;
   }
   
-  void prev()
+  public void previous()
   {
-    this.current = (this.current - 1 + this.amount) % this.amount;
+    this._current = (this._current - 1 + this._amount) % this._amount;
   }
   
-  void capture(PGraphics screen)
+  public void capture(PGraphics screen)
   {
-    this.img[this.current] = screen.get();
+    this._img[this._current] = screen.get();
   }
   
-  void show(PGraphics screen)
+  public void show(PGraphics screen)
   {
-    screen.image(this.img[current], 0, 0);
+    screen.image(this._img[this._current], 0, 0);
+  }
+  
+  public int get_amount()
+  {
+    return this._amount;
   }
 }
