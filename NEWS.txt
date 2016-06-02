@@ -7,6 +7,7 @@ Encres & Lumieres release notes
 * Fix bug #5: ArrayIndexOutOfBoundsException
 * Support alpha in /color
 * Add /brush/choice
+* Add /clear
 * Many spray can drawing strokes at the same time
 * Use integers for spray can identifiers
 

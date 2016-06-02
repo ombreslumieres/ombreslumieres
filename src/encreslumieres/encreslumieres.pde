@@ -4,7 +4,7 @@ import codeanticode.syphon.SyphonServer;
 
 // constants
 final String SYPHON_SERVER_NAME = "encres&lumieres";
-final boolean VERBOSE = true;
+final boolean VERBOSE = false;
 final int OSC_RECEIVE_PORT = 31340;
 
 

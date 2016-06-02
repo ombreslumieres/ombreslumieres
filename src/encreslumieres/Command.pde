@@ -98,8 +98,7 @@ public class UndoCommand extends Command
     
     public final void apply(App app)
     {
-      println("Undo: todo");
-      // TODO
+      app.apply_undo(this.get_spray_can_index());
     }
 }
 
@@ -113,6 +112,19 @@ public class RedoCommand extends Command
     
     public final void apply(App app)
     {
-      // TODO
+      app.apply_redo(this.get_spray_can_index());
+    }
+}
+
+public class ClearCommand extends Command
+{
+    public ClearCommand(int spray_can_index)
+    {
+      super(spray_can_index);
+    }
+    
+    public final void apply(App app)
+    {
+      app.apply_clear(this.get_spray_can_index());
     }
 }

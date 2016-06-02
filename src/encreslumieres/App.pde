@@ -205,7 +205,6 @@ class App
           new AddNodeCommand(MOUSE_GRAFFITI_IDENTIFIER, mouse_x, mouse_y)); // , float size
     }
     this._consume_commands();
-    this.create_points_if_needed();
 
     for (int i = 0; i < this._spray_cans.size(); i++)
     {
@@ -430,59 +429,83 @@ class App
     }
   }
   
+  /**
+   * Handles clear OSC messages.
+   */
+  private void handle_clear(int spray_can_index)
+  {
+    if (this.has_can_index(spray_can_index))
+    {
+      this._push_command((Command)
+          new ClearCommand(spray_can_index));
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
+  }
+  
+  /**
+   * Called by a command.
+   */
   public void apply_add_node(int spray_can_index, float x, float y) // , float size)
   {
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.add_node(x, y);
   }
   
+  /**
+   * Called by a command.
+   */
   public void apply_new_stroke(int spray_can_index)
   {
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.start_new_stroke();
   }
   
+  /**
+   * Called by a command.
+   */
   public void apply_new_stroke(int spray_can_index, float x, float y)
   {
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.start_new_stroke(x, y);
   }
   
+  /**
+   * Called by a command.
+   */
   public void apply_new_stroke(int spray_can_index, float x, float y, float size)
   {
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.start_new_stroke(x, y, size);
   }
   
+  /**
+   * Called by a command.
+   */
   public void apply_undo(int spray_can_index)
   {
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.undo();
   }
   
+  /**
+   * Called by a command.
+   */
   public void apply_redo(int spray_can_index)
   {
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.redo();
   }
-
-
+  
   /**
-   * Does the job of creating the points in the stroke, if we received OSC messages.
+   * Called by a command.
    */
-  private void create_points_if_needed()
+  public void apply_clear(int spray_can_index)
   {
-    //if (mousePressed)
-    //{
-    //  SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
-    //  spray_can.add_node(mouseX, mouseY); // FIXME
-    //}
-
-    for (int i = 0; i < _spray_cans.size(); i++)
-    {
-      SprayCan spray_can = _spray_cans.get(i);
-      // TODO
-    }
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    spray_can.clear_all_strokes();
   }
 
   /**
@@ -633,6 +656,15 @@ class App
       }
     }
     
+     // ---  /clear ---
+    else if (message.checkAddrPattern("/clear"))
+    {
+      if (message.checkTypetag("i"))
+      {
+        identifier = message.get(0).intValue();
+        this.handle_clear(identifier);
+      }
+    }
     // fallback
     else
     {
