@@ -1,16 +1,15 @@
 OSC message signatures for Encres & Lumieres
 ============================================
 Notes:
-* The spray identifier arguments are not used for now.
-* Use "default" for the default spray identifier.
+* Use 0 for the default spray identifier. (the one controlled by the mouse)
 * Often, either float or int arguments are accepted. (but they must all be either float or int)
 
 
 blob
 ----
 Signatures:
-* /blob ,sfff
-* /blob ,siii
+* /blob ,ifff
+* /blob ,iiii
 
 Arguments:
 * Argument 1: spray identifier.
@@ -27,8 +26,8 @@ See the blobdetective software.
 force
 -----
 Signatures:
-* /force ,sf
-* /force ,si
+* /force ,if
+* /force ,ii
 
 Arguments:
 * Argument 1: spray identifier.
@@ -41,14 +40,15 @@ The force is used as an on/off controller for painting.
 color
 -----
 Signatures:
-* /color ,sfff
-* /color ,siii
+* /color ,iffff
+* /color ,iiiii
 
 Arguments:
 * Argument 1: spray identifier.
 * Argument 2: red [0-255]
 * Argument 3: green [0-255]
 * Argument 4: blue [0-255]
+* Argument 5: alpha [0-255]
 
 Description:
 Sets the color of a brush.
@@ -57,8 +57,8 @@ Sets the color of a brush.
 brush weight
 ------------
 Signatures:
-* /brush/weight ,si
-* /brush/weight ,sf
+* /brush/weight ,ii
+* /brush/weight ,if
 
 Arguments:
 * Argument 1: spray identifier.
@@ -67,13 +67,29 @@ Arguments:
 Description:
 Sets the weight of a brush.
 
+brush choice
+------------
+Signatures:
+* /brush/choice ,ii
+* /brush/choice ,if
+
+Arguments:
+* Argument 1: spray identifier.
+* Argument 2: brush choice. Brushes are numbered 0, 1, 2, 3, etc.
+
+Description:
+Sets the choice of brush.
+
+Brush 0 is a point shader. Brush 1, 2, 3, etc. are PNG files, randomly rotated.
+
 
 undo
 ----
 Signature:
-* /undo
+* /undo ,i
 
-Arguments: no argument
+Arguments:
+* Argument 1: spray identifier.
 
 Description:
 Undos the last stroke that ended.
@@ -82,9 +98,10 @@ Undos the last stroke that ended.
 redo
 ----
 Signature:
-* /redo
+* /redo ,i
 
-Arguments: no argument
+Arguments:
+* Argument 1: spray identifier.
 
 Description:
 Redos the last thing undone. (see /undo)

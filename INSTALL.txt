@@ -1,3 +1,19 @@
+Installation instructions
+=========================
+To use this project, in short:
+* Download Processing
+* Install blobdetective on GNU/Linux. Use it with a modified PlayStation3
+  Eye. (for infrared computer vision) - use the proper IP address for OSC
+  messages sent by blobdetective
+* Burn the firmware on ESP8266 (A wifi chip that can take Arduino code)
+  with a force-sensitive sensor (FSR) Make sure to set your wifi credentials
+  in the Arduino code before uploading. (also set the IP address to send OSC
+  messages to)
+* Use a infrared LED so that the camera sees it.
+* Run the sketch (potentially comment out Syphon function calls in the main
+  file of the Processing sketch.
+
+
 Install blobdetective
 ---------------------
 See https://github.com/interferences-at/blobdetective

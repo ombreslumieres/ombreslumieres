@@ -1,9 +1,14 @@
 Encres & Lumieres release notes
 ===============================
 
-2016-04-?? - 0.2.1
+2016-06-02 - 1.0.0
 ------------------
-TODO
+* Fix bug #1: Strokes are sometimes linked between their end and beginning
+* Fix bug #5: ArrayIndexOutOfBoundsException
+* Support alpha in /color
+* Add /brush/choice
+* Many spray can drawing strokes at the same time
+* Use integers for spray can identifiers
 
 2016-04-05 - 0.2.0
 ------------------
@@ -14,6 +19,6 @@ TODO
 
 2016-03-28 - 0.1.0
 ------------------
-* One color spray paiting shader
+* One color spray painting shader
 * Arduino force sensor - sends OSC
 * Blob tracking - see the blobdetective project
