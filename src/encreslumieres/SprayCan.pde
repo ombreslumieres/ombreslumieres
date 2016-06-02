@@ -5,14 +5,13 @@ class SprayCan
 {
   // constants
   private final float DEFAULT_STEP_SIZE = 5.0; // how many pixels between each brush drawn - interpolated. See PointShaderBrush
-  private final float DEFAULT_BRUSH_SIZE = 64; // size of the brush in pixels
-  private final float BRUSH_SCALE = 0.3; // FIXME: what is this?
+  private final float DEFAULT_BRUSH_WEIGHT = 64; // size of the brush in pixels
+  
   
   // attributes
   private ArrayList<Stroke> _strokes; // Lists of nodes - to be drawn only once
   private color _color; // Current color
-  //private float _brush_size; // XXX duplicate with _cursor_blob_size
-  private float _brush_weight = DEFAULT_BRUSH_SIZE; // We use this. Set for each can using OSC messages.
+  private float _brush_weight = DEFAULT_BRUSH_WEIGHT; // Set for each can using OSC messages.
   private Brush _current_brush; // Instance of a Brush to draw on our buffer
   private PGraphics _buffer = null; // Our pixel buffer.
   private int _image_width; // sketch size
@@ -94,7 +93,7 @@ class SprayCan
     noFill();
     strokeWeight(1.0);
     stroke(255, 0, 0);
-    float ellipse_size = this._brush_weight; // this._brush_size * BRUSH_SCALE;
+    float ellipse_size = this._brush_weight;
     float cursor_x = this._cursor_x;
     float cursor_y = this._cursor_y;
     ellipse(cursor_x, cursor_y, ellipse_size, ellipse_size);
@@ -239,15 +238,6 @@ class SprayCan
   }
 
   /**
-   * Sets the size of the spray.
-   * FIXME: set_brush_size vs set_brush_weight?
-   */
-  //public void set_brush_size(float value)
-  //{
-  //  this._brush_size = value;
-  //}
-
-  /**
    * Sets the color of the spray.
    * The brush should take into account the alpha.
    */
@@ -262,5 +252,15 @@ class SprayCan
   public color get_color()
   {
     return this._color;
+  }
+  
+  public void undo()
+  {
+    println("TODO undo");
+  }
+  
+  public void redo()
+  {
+    println("TODO redo");
   }
 }

@@ -201,9 +201,8 @@ class App
     
     if (this._mouse_is_pressed)
     {
-      //SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
-      //spray_can.add_node(mouseX, mouseY); // FIXME
-      this._push_command((Command) new AddNodeCommand(MOUSE_GRAFFITI_IDENTIFIER, mouse_x, mouse_y)); // , float size
+      this._push_command((Command)
+          new AddNodeCommand(MOUSE_GRAFFITI_IDENTIFIER, mouse_x, mouse_y)); // , float size
     }
     this._consume_commands();
     this.create_points_if_needed();
@@ -234,9 +233,8 @@ class App
 
   public void mousePressed_cb(float mouse_x, float mouse_y)
   {
-    //SprayCan spray_can = this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER);
-    //spray_can.start_new_stroke(mouse_x, mouse_y);
-    this._push_command((Command) new NewStrokeCommand(MOUSE_GRAFFITI_IDENTIFIER));
+    this._push_command((Command)
+        new NewStrokeCommand(MOUSE_GRAFFITI_IDENTIFIER));
     this._mouse_is_pressed = true;
   }
 
@@ -362,7 +360,7 @@ class App
     return ret;
   }
   
-  private float _force_to_weight(float value)
+  private float _force_to_alpha(float value)
   {
     // TODO
     return 0.0;
@@ -405,11 +403,10 @@ class App
    */
   private void handle_redo(int spray_can_index)
   {
-    // TODO
     if (this.has_can_index(spray_can_index))
     {
-      SprayCan spray_can = this._spray_cans.get(spray_can_index);
-      println("TODO: redo");
+      this._push_command((Command)
+          new RedoCommand(spray_can_index));
     }
     else
     {
@@ -424,8 +421,8 @@ class App
   {
     if (this.has_can_index(spray_can_index))
     {
-      SprayCan spray_can = this._spray_cans.get(spray_can_index);
-      println("TODO: undo");
+      this._push_command((Command)
+          new UndoCommand(spray_can_index));
     }
     else
     {
@@ -456,6 +453,19 @@ class App
     SprayCan spray_can = this._spray_cans.get(spray_can_index);
     spray_can.start_new_stroke(x, y, size);
   }
+  
+  public void apply_undo(int spray_can_index)
+  {
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    spray_can.undo();
+  }
+  
+  public void apply_redo(int spray_can_index)
+  {
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    spray_can.redo();
+  }
+
 
   /**
    * Does the job of creating the points in the stroke, if we received OSC messages.
