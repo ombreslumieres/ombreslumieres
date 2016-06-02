@@ -11,8 +11,8 @@ class SprayCan
   // attributes
   private ArrayList<Stroke> _strokes; // Lists of nodes - to be drawn only once
   private color _color; // Current color
-  private float _brush_size; // XXX duplicate with _cursor_size
-  private float _brush_weight; // We use this. Set for each can using OSC messages.
+  //private float _brush_size; // XXX duplicate with _cursor_blob_size
+  private float _brush_weight = DEFAULT_BRUSH_SIZE; // We use this. Set for each can using OSC messages.
   private Brush _current_brush; // Instance of a Brush to draw on our buffer
   private PGraphics _buffer = null; // Our pixel buffer.
   private int _image_width; // sketch size
@@ -20,7 +20,7 @@ class SprayCan
   private float _default_step_size; // how many pixels between each brush drawn - interpolated. See PointShaderBrush
   private float _cursor_x = 0.0; // blob X
   private float _cursor_y = 0.0; // blob Y
-  private float _cursor_size = 0.0; // blob size
+  private float _cursor_blob_size = 0.0; // blob size
   private boolean _is_spraying = false; // set when we receive /force
     // TODO: add undo here
 
@@ -33,7 +33,7 @@ class SprayCan
   {
     this._strokes = new ArrayList<Stroke>();
     this._color = color(255, 255, 255, 255);
-    this._brush_size = this.DEFAULT_BRUSH_SIZE; // FIXME
+    //this._brush_size = this.DEFAULT_BRUSH_SIZE; // FIXME
     this._default_step_size = this.DEFAULT_STEP_SIZE;
     this._image_width = image_width;
     this._image_height = image_height;
@@ -89,26 +89,29 @@ class SprayCan
    */
   public void draw_cursor()
   {
-    // TODO
+    // TODO: probably use an image instead
     pushStyle();
     noFill();
     strokeWeight(1.0);
     stroke(255, 0, 0);
-    float ellipse_size = this._brush_size * BRUSH_SCALE;
+    float ellipse_size = this._brush_weight; // this._brush_size * BRUSH_SCALE;
     float cursor_x = this._cursor_x;
     float cursor_y = this._cursor_y;
     ellipse(cursor_x, cursor_y, ellipse_size, ellipse_size);
+    float line_size = ellipse_size / 2.0;
+    line(cursor_x - line_size, cursor_y, cursor_x + line_size, cursor_y);
+    line(cursor_x, cursor_y - line_size, cursor_x, cursor_y + line_size);
     popStyle();
   }
   
   /**
    * Sets the cursor X and Y position, as well as its size.
    */
-  public void set_cursor_x_y_size(float x, float y, float size)
+  public void set_cursor_x_y_size(float x, float y, float cursor_blob_size)
   {
     this._cursor_x = x;
     this._cursor_y = y;
-    this._cursor_size = size;
+    this._cursor_blob_size = cursor_blob_size;
   }
   
   /**
@@ -150,14 +153,20 @@ class SprayCan
     // FIXME: we probably need to remove each path in our array list, we is not done here.
     this._buffer = createGraphics(_image_width, _image_height, P3D);
   }
+  
+  private float _get_node_weight()
+  {
+    // we might use 
+    return this._brush_weight;
+  }
 
   /**
    * Starts a stroke with a given first node position and size.
    */
-  public void start_new_stroke(float x, float y, float brush_size)
+  public void start_new_stroke(float x, float y, float cursor_blob_size)
   {  
-    Node starting_node = new Node(x, y, brush_size, this._color);
-    this._brush_size = brush_size;
+    Node starting_node = new Node(x, y, this._get_node_weight(), this._color);
+    this._cursor_blob_size = cursor_blob_size;
     Stroke stroke = new Stroke(starting_node, this._default_step_size);
     stroke.set_brush(this._current_brush);
     this._strokes.add(stroke);
@@ -169,7 +178,7 @@ class SprayCan
    */
   public void start_new_stroke(float x, float y)
   {  
-    this.start_new_stroke(x, y, this._brush_size);
+    this.start_new_stroke(x, y, this._get_node_weight());
   }
   
   /**
@@ -187,17 +196,19 @@ class SprayCan
   /**
    * Adds a node to the current stroke.
    */
-  public void add_node(float x, float y, float brush_size)
+  public void add_node(float x, float y, float cursor_blob_size)
   {
     Stroke active_stroke = this._get_active_stroke();
     if (active_stroke == null)
     {
-      this.start_new_stroke(x, y, brush_size);
+      this.start_new_stroke(x, y, this._get_node_weight());
       return;
-    } else
+    }
+    else
     {
-      Node newKnot = new Node(x, y, brush_size, this._color);
-      this._brush_size = brush_size;
+      this._cursor_blob_size = cursor_blob_size;
+      Node newKnot = new Node(x, y, this._get_node_weight(), this._color);
+      
       active_stroke.add_knot(newKnot);
       return;
     }
@@ -208,7 +219,7 @@ class SprayCan
    */
   public void add_node(float x, float y)
   {
-    this.add_node(x, y, this._brush_size);
+    this.add_node(x, y, this._get_node_weight());
   }
 
   /**
@@ -231,10 +242,10 @@ class SprayCan
    * Sets the size of the spray.
    * FIXME: set_brush_size vs set_brush_weight?
    */
-  public void set_brush_size(float value)
-  {
-    this._brush_size = value;
-  }
+  //public void set_brush_size(float value)
+  //{
+  //  this._brush_size = value;
+  //}
 
   /**
    * Sets the color of the spray.

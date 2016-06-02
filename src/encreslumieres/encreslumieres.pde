@@ -28,7 +28,7 @@ void setup()
   app = new App();
   app.set_osc_receive_port(OSC_RECEIVE_PORT);
   app.set_verbose(VERBOSE);
-  app.set_size(width, height);
+  app.set_sketch_size(width, height);
   app.setup_cb();
   // XXX comment out next line if not using Syphon
   syphon_server = new SyphonServer(this, SYPHON_SERVER_NAME);

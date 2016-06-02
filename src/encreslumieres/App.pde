@@ -3,7 +3,7 @@ import oscP5.OscMessage;
 import oscP5.OscP5;
 
 
-final String VERSION = "0.3.0";
+final String VERSION = "1.0.0";
 
 
 class App
@@ -13,7 +13,7 @@ class App
   private final String OSC_SEND_HOST = "127.0.0.1";
   private final int BLOB_INPUT_WIDTH = 640;
   private final int BLOB_INPUT_HEIGHT = 480;
-  private final int NUM_SPRAY_CANS = 10;
+  private final int NUM_SPRAY_CANS = 6;
   private final int MOUSE_GRAFFITI_IDENTIFIER = 0;
   private final String BACKGROUND_IMAGE_NAME = "background.png";
   /*
@@ -60,7 +60,6 @@ class App
     {
       SprayCan item = new SprayCan(width, height); // FIXME using global vars here.
       item.set_color(color(255, 127, 63, 255)); // default color is orange
-      item.set_brush_size(32); // default brush size
       item.set_current_brush(this._brushes.get(0));
       this._spray_cans.add(item);
     }
@@ -173,12 +172,16 @@ class App
    * Sets the size of the canvas. 
    * Called from the main sketch file.
    */
-  public void set_size(int size_width, int size_height)
+  public void set_sketch_size(int size_width, int size_height)
   {
     this._width = size_width;
     this._height = size_height;
   }
-
+  
+  /**
+   * Sets up the app.
+   * Called from the main sketch file.
+   */
   public void setup_cb()
   {
     this._test_buffer = createGraphics(this._width, this._height, P3D);
@@ -187,9 +190,13 @@ class App
     this._osc_send_address = new NetAddress(OSC_SEND_HOST, OSC_SEND_PORT);
   }
 
+  /**
+   * Draws the whole sketch.
+   * Called from the main sketch file.
+   */
   public void draw_cb(float mouse_x, float mouse_y)
   {
-    background(0);
+    // background(0);
     image(this._background_image, 0, 0);
     
     if (this._mouse_is_pressed)
