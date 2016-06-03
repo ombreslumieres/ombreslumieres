@@ -6,6 +6,7 @@ class SprayCan
   // constants
   private final float DEFAULT_STEP_SIZE = 5.0; // how many pixels between each brush drawn - interpolated. See PointShaderBrush
   private final float DEFAULT_BRUSH_WEIGHT = 64; // size of the brush in pixels
+  private final int NUMBER_OF_UNDO_LEVELS = 5;
   
   
   // attributes
@@ -21,6 +22,7 @@ class SprayCan
   private float _cursor_y = 0.0; // blob Y
   private float _cursor_blob_size = 0.0; // blob size
   private boolean _is_spraying = false; // set when we receive /force
+  private Undo _undo;
     // TODO: add undo here
 
   /**
@@ -36,6 +38,7 @@ class SprayCan
     this._default_step_size = this.DEFAULT_STEP_SIZE;
     this._image_width = image_width;
     this._image_height = image_height;
+    this._undo = new Undo(this.NUMBER_OF_UNDO_LEVELS, this._image_width, this._image_height);
     this._buffer = createGraphics(this._image_width, this._image_height, P3D);
   }
 
@@ -158,8 +161,9 @@ class SprayCan
       stroke.clear_stroke();
     }
     this._strokes.clear();
-    // FIXME: we probably need to remove each path in our array list, we is not done here.
-    this._buffer = createGraphics(_image_width, _image_height, P3D);
+    this._buffer = createGraphics(this._image_width, this._image_height, P3D);
+    
+    this._save_snapshot_for_undo_stack();
   }
   
   private float _get_node_weight()
@@ -173,11 +177,18 @@ class SprayCan
    */
   public void start_new_stroke(float x, float y, float cursor_blob_size)
   {  
+    this._save_snapshot_for_undo_stack();
+    
     Node starting_node = new Node(x, y, this._get_node_weight(), this._color);
     this._cursor_blob_size = cursor_blob_size;
     Stroke stroke = new Stroke(starting_node, this._default_step_size);
     stroke.set_brush(this._current_brush);
     this._strokes.add(stroke);
+  }
+  
+  private void _save_snapshot_for_undo_stack()
+  {
+    this._undo.take_snapshot(this._buffer);
   }
   
   /**
@@ -194,7 +205,9 @@ class SprayCan
    * Creates no first node.
    */
   public void start_new_stroke()
-  {  
+  {
+    this._save_snapshot_for_undo_stack();
+    
     Stroke stroke = new Stroke();
     stroke.set_step_size(this._default_step_size);
     stroke.set_brush(this._current_brush);
@@ -265,11 +278,30 @@ class SprayCan
   
   public void undo()
   {
-    println("TODO undo");
+    // FIXME: we save the pixel buffer, and can undo/redo it,
+    // but we don't delete the strokes and their nodes.
+    // The nodes are drawn only once, anyways
+    // and we save that to our pixel buffer
+    // so we don't care for now about there arrays
+    // but some day, when we want to save/playback the strokes
+    // we will want to cleanup these strokes when we done with one
+    // (since it was cancelled, for example)
+    
+    this._buffer.beginDraw();
+    this._buffer.pushStyle();
+    this._buffer.tint(color(255, 255, 255, 255));
+    this._undo.undo(this._buffer);
+    this._buffer.popStyle();
+    this._buffer.endDraw();
   }
   
   public void redo()
   {
-    println("TODO redo");
+    this._buffer.beginDraw();
+    this._buffer.pushStyle();
+    this._buffer.tint(color(255, 255, 255, 255));
+    this._undo.redo(this._buffer);
+    this._buffer.popStyle();
+    this._buffer.endDraw();
   }
 }

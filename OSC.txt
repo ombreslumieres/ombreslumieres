@@ -105,3 +105,16 @@ Arguments:
 
 Description:
 Redos the last thing undone. (see /undo)
+
+
+set force threshold
+--------------------
+Signature:
+* /set/force/threshold ,i
+
+Arguments:
+* Argument 1: value
+
+Description:
+Changes the FSR sensor on/off threshold value.
+It's the same for all spray cans.

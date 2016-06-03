@@ -5,7 +5,21 @@ import oscP5.OscP5;
 
 final String VERSION = "1.0.0";
 
-
+/**
+ * Encres & lumières
+ * Spray paint controlled via OSC.
+ * Syphon output.
+ * Dependencies:
+ * - oscP5
+ * - syphon
+ *
+ * To run: Command-R (or Control-R)
+ * To run full screen: Command-Shift-R (or Control-Shift-R)
+ * 
+ * Interactive controls:
+ * - z: undo 
+ * - r: redo
+ */
 class App
 {
   // private constants
@@ -22,11 +36,11 @@ class App
    * if we received, 100, example, we will turn it here into
    * 1023 - 100, which results in 923. Now we will compare it to
    * a threshold, for example 400. If that inverted force is over
-   * 400, the brush will be on. FORCE_THRESHOLD is what you will
+   * 400, the brush will be on. this._force_threshold is what you will
    * need to change often. See below.
    */
   final int FORCE_MAX = 1023; // DO NOT change this
-  final int FORCE_THRESHOLD = 150; // you will need to change this. Used to be 623, then 200
+  int _force_threshold = 150; // you will need to change this. Used to be 623, then 200
 
   // private attributes
   private boolean _verbose = false;
@@ -65,6 +79,12 @@ class App
     }
     
     // XXX See this.setup_cb() for more initialization. (OSC receiver, etc.)
+  }
+  
+  public void set_force_threshold(int value)
+  {
+    // TODO: we could have a different force threshold for each spraycan
+    this._force_threshold = value;
   }
   
   private synchronized void _push_command(Command command)
@@ -246,6 +266,14 @@ class App
 
   public void keyPressed_cb()
   {
+    if (key == 'z' || key == 'Z')
+    {
+      this.handle_undo(MOUSE_GRAFFITI_IDENTIFIER);
+    }
+    else if (key == 'r' || key == 'R')
+    {
+      this.handle_redo(MOUSE_GRAFFITI_IDENTIFIER);
+    }
   }
 
   /**
@@ -352,7 +380,7 @@ class App
     boolean ret = false;
     // Invert the number
     force = FORCE_MAX - force;
-    if (force > FORCE_THRESHOLD)
+    if (force > this._force_threshold)
     {
       ret = true;
     }
@@ -665,6 +693,16 @@ class App
         this.handle_clear(identifier);
       }
     }
+    
+    else if (message.checkAddrPattern("/set/force/threshold"))
+    {
+      if (message.checkTypetag("i"))
+      {
+        int value = message.get(0).intValue();
+        this.set_force_threshold(value);
+      }
+    }
+    
     // fallback
     else
     {
