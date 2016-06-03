@@ -1,12 +1,12 @@
 class ImageBrush extends Brush
 {
-  private PImage _image = null;
+  ArrayList<PImage> _images;
   private boolean _enable_rotation = true;
   
   public ImageBrush()
   {
     super();
-    this._image = null;
+    this._images = new ArrayList<PImage>();
   }
   
   public void set_enable_rotation(boolean value)
@@ -16,15 +16,24 @@ class ImageBrush extends Brush
   
   public void load_image(String image_file_name)
   {
-    this._image = loadImage(image_file_name);
+    this._images.add(loadImage(image_file_name));
   }
   
   public final void draw_brush(PGraphics buffer, float x, float y, float size, color colour)
   {
-    if (this._image == null)
+    PImage chosen_image = null;
+    if (this._images.size() == 0)
     {
       println("ImageBrush::draw_brush: Warning: No image loaded yet.");
       return;
+    }
+    else if (this._images.size() == 1)
+    {
+      chosen_image = this._images.get(0);
+    }
+    else
+    {
+      chosen_image = this._images.get((int) random(this._images.size() - 1));
     }
     
     buffer.pushStyle();
@@ -38,7 +47,7 @@ class ImageBrush extends Brush
       buffer.rotate(radians(random(0.0, 360.0)));
     }
     buffer.imageMode(CENTER);
-    buffer.image(this._image, 0, 0, size, size);
+    buffer.image(chosen_image, 0, 0, size, size);
     
     buffer.popMatrix();
     buffer.popStyle();
