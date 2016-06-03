@@ -88,18 +88,27 @@ class SprayCan
    */
   public void draw_cursor()
   {
-    // TODO: probably use an image instead
+    // we could use an image instead, but scaling it might be more complicated
     pushStyle();
     noFill();
-    strokeWeight(1.0);
-    stroke(255, 0, 0);
+    
     float ellipse_size = this._brush_weight;
     float cursor_x = this._cursor_x;
     float cursor_y = this._cursor_y;
-    ellipse(cursor_x, cursor_y, ellipse_size, ellipse_size);
     float line_size = ellipse_size / 2.0;
+    
+    strokeWeight(3.0);
+    stroke(#cccccc);
+    ellipse(cursor_x, cursor_y, ellipse_size, ellipse_size);
     line(cursor_x - line_size, cursor_y, cursor_x + line_size, cursor_y);
     line(cursor_x, cursor_y - line_size, cursor_x, cursor_y + line_size);
+    
+    strokeWeight(1.0);
+    stroke(#333333);
+    ellipse(cursor_x, cursor_y, ellipse_size, ellipse_size);
+    line(cursor_x - line_size, cursor_y, cursor_x + line_size, cursor_y);
+    line(cursor_x, cursor_y - line_size, cursor_x, cursor_y + line_size);
+    
     popStyle();
   }
   
@@ -139,8 +148,8 @@ class SprayCan
     return this._cursor_y;
   }
 
-  /*
-  * Deletes all the strokes.
+  /**
+   * Deletes all the strokes.
    */
   public void clear_all_strokes()
   {
