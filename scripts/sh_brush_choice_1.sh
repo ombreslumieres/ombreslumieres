@@ -1,0 +1,5 @@
+#!/bin/bash
+OSC_SEND_PORT=31340
+IDENTIFIER=0
+BRUSH_CHOICE=1
+osc-send -p ${OSC_SEND_PORT} /brush/choice ,ii ${IDENTIFIER} ${BRUSH_CHOICE}
