@@ -20,7 +20,7 @@ final int BRUSH_WEIGHT_STEP = 10;
 final int DEFAULT_IDENTIFIER = 0;
 final boolean VERBOSE = false;
 // FIXME: if force < 400, it means it's pressed. Counter-intuitive, I know.
-final int FORCE_IF_PRESSED = 0;
+final int FORCE_IF_PRESSED = 800;
 final int FORCE_IF_NOT_PRESSED = 1023;
 final float BRUSH_SCALE = 0.3; // FIXME: ratio taken from Knot.pde (not quite right)
 

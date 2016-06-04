@@ -48,7 +48,7 @@ class App
   private int _width = 640; // window width
   private int _height = 480; // window height
   private PGraphics _test_buffer = null;
-  PImage _background_image;
+  // PImage _background_image;
   OscP5 _osc_receiver;
   NetAddress _osc_send_address;
   ArrayList<SprayCan> _spray_cans;
@@ -67,7 +67,7 @@ class App
     this._brushes = new ArrayList<Brush>();
     this._commands = new ArrayList<Command>();
     this._load_brushes();
-    this._background_image = loadImage(BACKGROUND_IMAGE_NAME);
+    //this._background_image = loadImage(BACKGROUND_IMAGE_NAME);
 
     this._spray_cans = new ArrayList<SprayCan>();
     for (int i = 0; i < this.NUM_SPRAY_CANS; i++)
@@ -269,8 +269,9 @@ class App
    */
   public void draw_cb(float mouse_x, float mouse_y)
   {
+    background(0, 0, 0, 0);
     // background(0);
-    image(this._background_image, 0, 0);
+    //image(this._background_image, 0, 0);
     
     if (this._mouse_is_pressed)
     {
