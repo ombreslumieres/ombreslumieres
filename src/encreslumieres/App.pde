@@ -30,6 +30,7 @@ class App
   private final int NUM_SPRAY_CANS = 6; // maximum number of spraycans - not too many is more optimized
   private final int MOUSE_GRAFFITI_IDENTIFIER = 0; // the index of the mouse spraycan
   private final String BACKGROUND_IMAGE_NAME = "background.png"; // you can change the background image by changing this file
+  private int DEFAULT_BRUSH = 0;
   /*
    * Now, the /force we receive from the Arduino over wifi is 
    * within the range [0,1023] and we invert the number, so that
@@ -40,7 +41,7 @@ class App
    * need to change often. See below.
    */
   final int FORCE_MAX = 1023; // DO NOT change this
-  int _force_threshold = 150; // you will need to change this. Used to be 623, then 200
+  int _force_threshold = 50; // you will need to change this. Used to be 623, then 200
 
   // private attributes
   private boolean _verbose = false;
@@ -56,6 +57,9 @@ class App
   ArrayList<Command> _commands;
   boolean _mouse_is_pressed = false;
   boolean debug_force = false;
+  
+  float MINIMUM_ALPHA = 0.2;
+  float MAXIMUM_ALPHA = 5.0;
 
   /**
    * Constructor.
@@ -73,8 +77,8 @@ class App
     for (int i = 0; i < this.NUM_SPRAY_CANS; i++)
     {
       SprayCan item = new SprayCan(width, height); // FIXME using global vars here.
-      item.set_color(color(255, 127, 63, 255)); // default color is orange
-      item.set_current_brush(this._brushes.get(0));
+      item.set_color(color(255, 255, 255, 255)); // default color is orange
+      item.set_current_brush(this._brushes.get(this.DEFAULT_BRUSH));
       this._spray_cans.add(item);
     }
     
@@ -201,6 +205,8 @@ class App
     image_brush.load_image("13_Part01_00048_64x64.png");
     image_brush.load_image("13_Part01_00049_64x64.png");
     this._brushes.add((Brush) image_brush);
+    
+    DEFAULT_BRUSH = 13;
   }
   
   public boolean has_can_index(int spray_can_index)
@@ -275,6 +281,7 @@ class App
     
     if (this._mouse_is_pressed)
     {
+      // FIXME: we must set the value of the force sensor to set the alpha_ratio
       this._push_command((Command)
           new AddNodeCommand(MOUSE_GRAFFITI_IDENTIFIER, mouse_x, mouse_y)); // , float size
     }
@@ -408,11 +415,11 @@ class App
   
   private float _map_force_to_alpha_ratio(float value)
   {
-    float MINIMUM_ALPHA = 0.2;
-    float MAXIMUM_ALPHA = 1.0;
+
     // Invert the number
     float force = FORCE_MAX - value;
     float ret = map(force, this._force_threshold, this.FORCE_MAX, MINIMUM_ALPHA, MAXIMUM_ALPHA);
+    ret = min(1.0, ret); 
     return ret;
   }
 
