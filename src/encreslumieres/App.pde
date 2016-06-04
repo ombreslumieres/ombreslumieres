@@ -207,6 +207,8 @@ class App
     this._brushes.add((Brush) image_brush);
     
     DEFAULT_BRUSH = 13;
+    
+    this._brushes.add((Brush) new EraserBrush());
   }
   
   public boolean has_can_index(int spray_can_index)
