@@ -41,7 +41,7 @@ class App
    * need to change often. See below.
    */
   final int FORCE_MAX = 1023; // DO NOT change this
-  int _force_threshold = 50; // you will need to change this. Used to be 623, then 200
+  int _force_threshold = 50; // Please change this! FSR threshold. (FSR is in the range [0,1023]
 
   // private attributes
   private boolean _verbose = false;
@@ -58,8 +58,8 @@ class App
   boolean _mouse_is_pressed = false;
   boolean debug_force = false;
   
-  float MINIMUM_ALPHA = 0.2;
-  float MAXIMUM_ALPHA = 5.0;
+  float MINIMUM_ALPHA = 0.0; // Here is the min/max alpha ratio according to force FSR pressure sensor
+  float MAXIMUM_ALPHA = 0.6;
 
   /**
    * Constructor.
@@ -415,11 +415,9 @@ class App
   
   private float _map_force_to_alpha_ratio(float value)
   {
-
-    // Invert the number
-    float force = FORCE_MAX - value;
-    float ret = map(force, this._force_threshold, this.FORCE_MAX, MINIMUM_ALPHA, MAXIMUM_ALPHA);
-    ret = min(1.0, ret); 
+    float ret = map(value, this._force_threshold, this.FORCE_MAX, MINIMUM_ALPHA, MAXIMUM_ALPHA);
+    ret = min(ret, 1.0);
+    ret = max(ret, 0.0); // clip within [0,1]
     return ret;
   }
 
@@ -453,8 +451,6 @@ class App
   private boolean _force_to_is_pressed(int force)
   {
     boolean ret = false;
-    // Invert the number
-    force = FORCE_MAX - force;
     if (force > this._force_threshold)
     {
       ret = true;
@@ -467,7 +463,9 @@ class App
    */
   private void handle_force(int spray_can_index, int force)
   {
-    // TODO
+    // Invert the number (only once here)
+    force = FORCE_MAX - force;
+    
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);

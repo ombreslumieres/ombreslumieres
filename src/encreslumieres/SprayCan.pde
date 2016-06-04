@@ -64,6 +64,7 @@ class SprayCan
 
   public void set_alpha_ratio(float value)
   {
+    //println("alpha ratio " + value);
     this._alpha_ratio = value;
   }
 
