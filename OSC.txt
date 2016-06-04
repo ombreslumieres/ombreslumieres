@@ -82,6 +82,8 @@ Sets the choice of brush.
 
 Brush 0 is a point shader. Brush 1, 2, 3, etc. are PNG files, randomly rotated.
 
+Brush 14 is an eraser. The size of the eraser is the same as the brushes.
+
 
 undo
 ----
