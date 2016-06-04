@@ -23,7 +23,7 @@ class SprayCan
   private float _cursor_blob_size = 0.0; // blob size
   private boolean _is_spraying = false; // set when we receive /force
   private Undo _undo;
-  private int _opacity_set_from_force = 255;
+  private float _alpha_ratio = 1.0; // range: [0,1]
 
 
   /**
@@ -62,9 +62,9 @@ class SprayCan
     return this._is_spraying;
   }
 
-  public void set_opacity_set_from_force(int alpha)
+  public void set_alpha_ratio(float value)
   {
-    this._opacity_set_from_force = alpha;
+    this._alpha_ratio = value;
   }
 
   /**
@@ -84,6 +84,7 @@ class SprayCan
   public void draw_spraycan()
   {
     this._buffer.beginDraw();
+    this._buffer.colorMode(RGB, 255);
     for (Stroke stroke : this._strokes)
     {
       stroke.draw_stroke(this._buffer); // , shader);
@@ -180,7 +181,7 @@ class SprayCan
   
   color _generate_color_with_alpha_from_force()
   {
-    color ret = color(red(this._color), green(this._color), blue(this._color), alpha(this._color) * this._opacity_set_from_force);
+    color ret = color(red(this._color), green(this._color), blue(this._color), (int) alpha(this._color) * this._alpha_ratio);
     return ret;
   }
 

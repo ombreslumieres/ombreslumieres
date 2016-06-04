@@ -38,8 +38,8 @@ class ImageBrush extends Brush
     
     buffer.pushStyle();
     buffer.pushMatrix();
-    
-    buffer.colorMode(RGB);
+    //buffer.colorMode(RGB, 255);
+    //println("XXX: draw brush " + red(colour) + " " + green(colour) + " " + blue(colour) + " " + alpha(colour));
     buffer.tint(red(colour), green(colour), blue(colour), alpha(colour));
     buffer.translate(x, y);
     if (this._enable_rotation)

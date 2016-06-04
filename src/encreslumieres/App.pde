@@ -406,12 +406,13 @@ class App
     }
   }
   
-  float _map_blob_size_to_alpha(float value)
+  private float _map_force_to_alpha_ratio(float value)
   {
-    float MINIMUM_ALPHA = 100;
-    float MAXIMUM_ALPHA = 255;
-    float minimum_force = this._force_threshold;
-    float ret = map(value, this._force_threshold, this.FORCE_MAX, MINIMUM_ALPHA, MAXIMUM_ALPHA);
+    float MINIMUM_ALPHA = 0.2;
+    float MAXIMUM_ALPHA = 1.0;
+    // Invert the number
+    float force = FORCE_MAX - value;
+    float ret = map(force, this._force_threshold, this.FORCE_MAX, MINIMUM_ALPHA, MAXIMUM_ALPHA);
     return ret;
   }
 
@@ -438,6 +439,10 @@ class App
     }
   }
   
+  /**
+   * Given a force amount (from the FSR sensor)
+   * it converts it to a boolean: is pressed or not.
+   */
   private boolean _force_to_is_pressed(int force)
   {
     boolean ret = false;
@@ -450,12 +455,6 @@ class App
     return ret;
   }
   
-  private float _force_to_alpha(float value)
-  {
-    // TODO
-    return 0.0;
-  }
-
   /**
    * Handles /force OSC messages.
    */
@@ -472,7 +471,7 @@ class App
       boolean is_pressed = this._force_to_is_pressed(force);
       boolean was_pressed = spray_can.get_is_spraying();
       spray_can.set_is_spraying(is_pressed);
-      spray_can.set_opacity_set_from_force((int) this._map_blob_size_to_alpha(force));
+      spray_can.set_alpha_ratio(this._map_force_to_alpha_ratio(force));
       if (! was_pressed && is_pressed)
       {
         if (this.debug_force)
