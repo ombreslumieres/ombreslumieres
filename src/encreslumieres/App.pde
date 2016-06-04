@@ -373,6 +373,24 @@ class App
     }
   }
 
+ /**
+   * Handles /set/step_size OSC messages.
+   * For distance between each brush. (in pixels)
+   */
+  private void handle_set_step_size(int spray_can_index, float value)
+  {
+    // TODO
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      spray_can.set_step_size(value);
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
+  }
+
   /**
    * Handles /brush/weight OSC messages.
    */
@@ -772,6 +790,17 @@ class App
         this.set_force_threshold(value);
       }
     }
+
+    else if (message.checkAddrPattern("/set/step_size"))
+    {
+      if (message.checkTypetag("if"))
+      {
+        identifier = message.get(0).intValue();
+        float value = message.get(1).floatValue();
+        this.handle_set_step_size(identifier, value);
+      }
+    }
+    
     
     // fallback
     else

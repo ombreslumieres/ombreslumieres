@@ -120,3 +120,13 @@ Arguments:
 Description:
 Changes the FSR sensor on/off threshold value.
 It's the same for all spray cans.
+
+
+set step size
+-------------
+/set/step_size, if
+Arguments:
+* Argument 1: spray identifier
+
+Description:
+Sets the minimum distance between interpolated positions of nodes. (in pixels)

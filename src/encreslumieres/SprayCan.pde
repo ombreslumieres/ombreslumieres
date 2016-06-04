@@ -42,6 +42,11 @@ class SprayCan
     this._undo = new Undo(this.NUMBER_OF_UNDO_LEVELS, this._image_width, this._image_height);
     this._buffer = createGraphics(this._image_width, this._image_height, P3D);
   }
+  
+  public void set_step_size(float value)
+  {
+    this._default_step_size = value;
+  }
 
   /**
    * Sets whether or not it is spraying.
