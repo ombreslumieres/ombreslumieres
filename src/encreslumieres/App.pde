@@ -25,11 +25,11 @@ class App
   // private constants
   private final int OSC_SEND_PORT = 13333;
   private final String OSC_SEND_HOST = "127.0.0.1";
-  private final int BLOB_INPUT_WIDTH = 640;
-  private final int BLOB_INPUT_HEIGHT = 480;
-  private final int NUM_SPRAY_CANS = 6;
-  private final int MOUSE_GRAFFITI_IDENTIFIER = 0;
-  private final String BACKGROUND_IMAGE_NAME = "background.png";
+  private final int BLOB_INPUT_WIDTH = 640; // The PS3 Eye camera is 640x480
+  private final int BLOB_INPUT_HEIGHT = 480; // and blobdetective sends us the blob position in that range
+  private final int NUM_SPRAY_CANS = 6; // maximum number of spraycans - not too many is more optimized
+  private final int MOUSE_GRAFFITI_IDENTIFIER = 0; // the index of the mouse spraycan
+  private final String BACKGROUND_IMAGE_NAME = "background.png"; // you can change the background image by changing this file
   /*
    * Now, the /force we receive from the Arduino over wifi is 
    * within the range [0,1023] and we invert the number, so that
@@ -404,6 +404,15 @@ class App
       println("No such can index " + spray_can_index);
     }
   }
+  
+  float _map_blob_size_to_alpha(float value)
+  {
+    float MINIMUM_ALPHA = 100;
+    float MAXIMUM_ALPHA = 255;
+    float minimum_force = this._force_threshold;
+    float ret = map(value, this._force_threshold, this.FORCE_MAX, MINIMUM_ALPHA, MAXIMUM_ALPHA);
+    return ret;
+  }
 
   /**
    * Handles /blob OSC messages.
@@ -462,6 +471,7 @@ class App
       boolean is_pressed = this._force_to_is_pressed(force);
       boolean was_pressed = spray_can.get_is_spraying();
       spray_can.set_is_spraying(is_pressed);
+      spray_can.set_opacity_set_from_force((int) this._map_blob_size_to_alpha(force));
       if (! was_pressed && is_pressed)
       {
         if (this.debug_force)

@@ -23,7 +23,8 @@ class SprayCan
   private float _cursor_blob_size = 0.0; // blob size
   private boolean _is_spraying = false; // set when we receive /force
   private Undo _undo;
-    // TODO: add undo here
+  private int _opacity_set_from_force = 255;
+
 
   /**
    * Represents a spray can.
@@ -56,9 +57,14 @@ class SprayCan
    * Returns whether or not it is spraying.
    * (useful for adding more node when we receive new blob positions)
    */
-  boolean get_is_spraying()
+  public boolean get_is_spraying()
   {
     return this._is_spraying;
+  }
+
+  public void set_opacity_set_from_force(int alpha)
+  {
+    this._opacity_set_from_force = alpha;
   }
 
   /**
@@ -171,6 +177,12 @@ class SprayCan
     // we might use 
     return this._brush_weight;
   }
+  
+  color _generate_color_with_alpha_from_force()
+  {
+    color ret = color(red(this._color), green(this._color), blue(this._color), alpha(this._color) * this._opacity_set_from_force);
+    return ret;
+  }
 
   /**
    * Starts a stroke with a given first node position and size.
@@ -178,8 +190,8 @@ class SprayCan
   public void start_new_stroke(float x, float y, float cursor_blob_size)
   {  
     this._save_snapshot_for_undo_stack();
-    
-    Node starting_node = new Node(x, y, this._get_node_weight(), this._color);
+    color colour = this._generate_color_with_alpha_from_force();
+    Node starting_node = new Node(x, y, this._get_node_weight(), colour);
     this._cursor_blob_size = cursor_blob_size;
     Stroke stroke = new Stroke(starting_node, this._default_step_size);
     stroke.set_brush(this._current_brush);
@@ -228,7 +240,8 @@ class SprayCan
     else
     {
       this._cursor_blob_size = cursor_blob_size;
-      Node newKnot = new Node(x, y, this._get_node_weight(), this._color);
+      color colour = this._generate_color_with_alpha_from_force();
+      Node newKnot = new Node(x, y, this._get_node_weight(), colour);
       
       active_stroke.add_knot(newKnot);
       return;
