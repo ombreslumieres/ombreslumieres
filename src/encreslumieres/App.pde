@@ -350,8 +350,8 @@ class App
     float scale_center_x = spray_can.get_scale_center_x();
     float scale_factor = spray_can.get_scale_factor();
     
-    float from_x = (this._width * scale_center_x) - (this._width * scale_factor);
-    float to_x = (this._width * scale_center_x) + (this._width * scale_factor);
+    float from_x = (this._width * scale_center_x) - (this._width / 2.0 * scale_factor);
+    float to_x = (this._width * scale_center_x) + (this._width / 2.0 * scale_factor);
     return map(value, 0.0, BLOB_INPUT_WIDTH, from_x, to_x);
   }
 
@@ -365,8 +365,8 @@ class App
     float scale_center_y = spray_can.get_scale_center_y();
     float scale_factor = spray_can.get_scale_factor();
     
-    float from_y = (height_3_4 * scale_center_y) - (height_3_4 * scale_factor);
-    float to_y = (height_3_4 * scale_center_y) + (height_3_4 * scale_factor);
+    float from_y = (height_3_4 * scale_center_y) - (height_3_4 / 2.0 * scale_factor);
+    float to_y = (height_3_4 * scale_center_y) + (height_3_4 / 2.0 * scale_factor);
     return map(value, 0.0, BLOB_INPUT_HEIGHT, from_y, to_y);
   }
 
