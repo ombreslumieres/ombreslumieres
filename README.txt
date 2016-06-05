@@ -13,6 +13,7 @@ With code from:
 * Hauke Altmann - Graffiti Research Lab Germany
 * Raphael de Courville - Graffiti Research Lab Germany
 * Ian McEwan - Ashima Arts
+* Maxime Damecour
 
 Installation instructions
 -------------------------

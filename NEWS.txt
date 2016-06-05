@@ -1,7 +1,7 @@
 Encres & Lumieres release notes
 ===============================
 
-2016-06-02 - 1.0.0
+2016-06-05 - 1.0.0
 ------------------
 * Fix bug #1: Strokes are sometimes linked between their end and beginning
 * Fix bug #5: ArrayIndexOutOfBoundsException
@@ -10,6 +10,19 @@ Encres & Lumieres release notes
 * Add /clear
 * Many spray can drawing strokes at the same time
 * Use integers for spray can identifiers
+* change default step size to 1.0 - it will be slower
+* Add /link_strokes - link strokes with a straight line
+* add /layer
+* implement scale center and factor
+* add MANUAL.txt
+* add /set/step_size
+* add EraserBrush
+* FIX: bug #8 The EraserBrush makes pixels darker afterwhile
+* map force to alpha ratio
+* transparent background for syphon textures
+* add a multi-image brush
+* Improve the look of the cursor
+
 
 2016-04-05 - 0.2.0
 ------------------
