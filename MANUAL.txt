@@ -18,3 +18,12 @@ Brushes
 * 12 SpotSplat_64x64.png
 * 13 Part01_000xx_64x64.png (default)
 * 14 Eraser
+
+
+How to draw straight lines
+--------------------------
+* Make a spot - a stroke that has only a few nodes
+* Make another dot - and press hard on the force sensor.
+
+It will create a straight line between the two dots.
+Make many lines if you want to make it darker.
