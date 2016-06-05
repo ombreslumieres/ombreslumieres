@@ -133,8 +133,10 @@ class App
   
   private void _load_brushes()
   {
-    Brush point_shader_brush = new PointShaderBrush();
-    this._brushes.add(point_shader_brush);
+    //Brush point_shader_brush = new PointShaderBrush();
+    //this._brushes.add(point_shader_brush);
+    
+    this._brushes.add((Brush) new EraserBrush());
     
     //Brush image_brush = new ImageBrush();
     //((ImageBrush) image_brush).load_image("brush_A_1.png");

@@ -40,7 +40,7 @@ class SprayCan
     this._image_width = image_width;
     this._image_height = image_height;
     this._undo = new Undo(this.NUMBER_OF_UNDO_LEVELS, this._image_width, this._image_height);
-    this._buffer = createGraphics(this._image_width, this._image_height, P3D);
+    this._buffer = createGraphics(this._image_width, this._image_height);
   }
   
   public void set_step_size(float value)
