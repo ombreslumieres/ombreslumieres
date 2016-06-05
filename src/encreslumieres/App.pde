@@ -3,7 +3,7 @@ import oscP5.OscMessage;
 import oscP5.OscP5;
 
 
-final String VERSION = "1.0.0";
+final String VERSION = "1.0.1";
 
 /**
  * Encres & lumières

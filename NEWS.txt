@@ -1,6 +1,12 @@
 Encres & Lumieres release notes
 ===============================
 
+2016-06-?? - 1.0.1
+------------------
+* bug fixes?
+* TODO maybe
+
+
 2016-06-05 - 1.0.0
 ------------------
 * Fix bug #1: Strokes are sometimes linked between their end and beginning
