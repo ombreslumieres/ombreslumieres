@@ -130,3 +130,28 @@ Arguments:
 
 Description:
 Sets the minimum distance between interpolated positions of nodes. (in pixels)
+
+
+scale factor
+------------
+/scale/factor, if
+Arguments:
+* Argument 1: spray identifier
+* Argument 2: factor
+
+Description:
+Sets the scale factor (within the range [0,1]) for a spray can.
+The default is 1.0
+
+
+scale center
+------------
+/scale/center, iff
+Arguments:
+* Argument 1: spray identifier
+* Argument 2: center x (in the range [0,1])
+* Argument 3: center y (in the range [0,1])
+
+Description:
+Sets the scale center (within the range [0,1]) for a spray can.
+The default is (0.5, 0.5)
