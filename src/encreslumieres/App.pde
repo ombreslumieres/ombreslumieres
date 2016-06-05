@@ -29,7 +29,7 @@ class App
   private final int BLOB_INPUT_HEIGHT = 480; // and blobdetective sends us the blob position in that range
   private final int NUM_SPRAY_CANS = 6; // maximum number of spraycans - not too many is more optimized
   private final int MOUSE_GRAFFITI_IDENTIFIER = 0; // the index of the mouse spraycan
-  private final String BACKGROUND_IMAGE_NAME = "background.png"; // you can change the background image by changing this file
+  //private final String BACKGROUND_IMAGE_NAME = "background.png"; // you can change the background image by changing this file
   private int DEFAULT_BRUSH = 0;
   /*
    * Now, the /force we receive from the Arduino over wifi is 
@@ -48,7 +48,7 @@ class App
   private int _osc_receive_port = 31340;
   private int _width = 640; // window width
   private int _height = 480; // window height
-  private PGraphics _test_buffer = null;
+  // private PGraphics _test_buffer = null;
   // PImage _background_image;
   OscP5 _osc_receiver;
   NetAddress _osc_send_address;
@@ -136,7 +136,7 @@ class App
     //Brush point_shader_brush = new PointShaderBrush();
     //this._brushes.add(point_shader_brush);
     
-    this._brushes.add((Brush) new EraserBrush());
+    this._brushes.add((Brush) new EraserBrush()); // 0
     
     //Brush image_brush = new ImageBrush();
     //((ImageBrush) image_brush).load_image("brush_A_1.png");
@@ -210,7 +210,7 @@ class App
     
     DEFAULT_BRUSH = 13;
     
-    this._brushes.add((Brush) new EraserBrush());
+    this._brushes.add((Brush) new EraserBrush()); // 14
   }
   
   public boolean has_can_index(int spray_can_index)
@@ -267,7 +267,7 @@ class App
    */
   public void setup_cb()
   {
-    this._test_buffer = createGraphics(this._width, this._height, P3D);
+    //this._test_buffer = createGraphics(this._width, this._height, P3D);
     // start oscP5, listening for incoming messages at a given port
     this._osc_receiver = new OscP5(this, this._osc_receive_port);
     this._osc_send_address = new NetAddress(OSC_SEND_HOST, OSC_SEND_PORT);
@@ -344,18 +344,30 @@ class App
   /**
    * Convert a X coordinate from blob range to display range.
    */
-  private float map_x(float value)
+  private float map_x(int spray_can_index, float value)
   {
-    return map(value, 0.0, BLOB_INPUT_WIDTH, 0.0, this._width);
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    float scale_center_x = spray_can.get_scale_center_x();
+    float scale_factor = spray_can.get_scale_factor();
+    
+    float from_x = (this._width * scale_center_x) - (this._width * scale_factor);
+    float to_x = (this._width * scale_center_x) + (this._width * scale_factor);
+    return map(value, 0.0, BLOB_INPUT_WIDTH, from_x, to_x);
   }
 
   /**
    * Convert a Y coordinate from blob range to display range.
    */
-  private float map_y(float value)
+  private float map_y(int spray_can_index, float value)
   {
     float height_3_4 = this._width * (3.0 / 4.0);
-    return map(value, 0.0, BLOB_INPUT_HEIGHT, 0.0, height_3_4);
+    SprayCan spray_can = this._spray_cans.get(spray_can_index);
+    float scale_center_y = spray_can.get_scale_center_y();
+    float scale_factor = spray_can.get_scale_factor();
+    
+    float from_y = (height_3_4 * scale_center_y) - (height_3_4 * scale_factor);
+    float to_y = (height_3_4 * scale_center_y) + (height_3_4 * scale_factor);
+    return map(value, 0.0, BLOB_INPUT_HEIGHT, from_y, to_y);
   }
 
   /**
@@ -363,11 +375,47 @@ class App
    */
   private void handle_color(int spray_can_index, int r, int g, int b, int a)
   {
-    // TODO
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
       spray_can.set_color(color(r, g, b, a));
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
+  }
+  
+  /**
+   * Sets the center of the scale window.
+   * So we store the scale center and factor in the SprayCan attributes
+   * and then we use it in map_x and map_y methods of the App class.
+   *
+   * @param x: range [0,1]
+   * @param y: range [0,1]
+   */
+  private void handle_scale_center(int spray_can_index, float x, float y)
+  {
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      spray_can.set_scale_center(x, y);
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
+  }
+  
+  /**
+   * @param factor: range [0,1] How big the scaled window will be. (1 is the default)
+   */
+  private void handle_scale_factor(int spray_can_index, float factor)
+  {
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      spray_can.set_scale_factor(factor);
     }
     else
     {
@@ -381,7 +429,6 @@ class App
    */
   private void handle_set_step_size(int spray_can_index, float value)
   {
-    // TODO
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
@@ -398,7 +445,6 @@ class App
    */
   private void handle_brush_weight(int spray_can_index, int weight)
   {
-    // TODO
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
@@ -415,7 +461,6 @@ class App
    */
   private void handle_brush_choice(int spray_can_index, int brush_index)
   {
-    // TODO
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
@@ -451,8 +496,8 @@ class App
     if (this.has_can_index(spray_can_index))
     {
       SprayCan spray_can = this._spray_cans.get(spray_can_index);
-      float mapped_x = this.map_x(x);
-      float mapped_y = this.map_y(y);
+      float mapped_x = this.map_x(spray_can_index, x);
+      float mapped_y = this.map_y(spray_can_index, y);
       spray_can.set_cursor_x_y_size(mapped_x, mapped_y, size);
       if (spray_can.get_is_spraying())
       {
@@ -800,6 +845,27 @@ class App
         identifier = message.get(0).intValue();
         float value = message.get(1).floatValue();
         this.handle_set_step_size(identifier, value);
+      }
+    }
+    
+    else if (message.checkAddrPattern("/scale/center"))
+    {
+      if (message.checkTypetag("iff"))
+      {
+        identifier = message.get(0).intValue();
+        float x = message.get(1).floatValue();
+        float y = message.get(2).floatValue();
+        this.handle_scale_center(identifier, x, y);
+      }
+    }
+    
+    else if (message.checkAddrPattern("/scale/factor"))
+    {
+      if (message.checkTypetag("if"))
+      {
+        identifier = message.get(0).intValue();
+        float value = message.get(1).floatValue();
+        this.handle_scale_factor(identifier, value);
       }
     }
     

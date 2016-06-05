@@ -24,7 +24,9 @@ class SprayCan
   private boolean _is_spraying = false; // set when we receive /force
   private Undo _undo;
   private float _alpha_ratio = 1.0; // range: [0,1]
-
+  private float _scale_center_x = 0.5;
+  private float _scale_center_y = 0.5;
+  private float _scale_factor = 1.0;
 
   /**
    * Represents a spray can.
@@ -41,6 +43,35 @@ class SprayCan
     this._image_height = image_height;
     this._undo = new Undo(this.NUMBER_OF_UNDO_LEVELS, this._image_width, this._image_height);
     this._buffer = createGraphics(this._image_width, this._image_height);
+  }
+  
+  /**
+   * Sets the scale factor.
+   */
+  public void set_scale_center(float x, float y)
+  {
+    this._scale_center_x = x;
+    this._scale_center_y = y;
+  }
+  
+  public void set_scale_factor(float scale_factor)
+  {
+    this._scale_factor = scale_factor;
+  }
+  
+  public float get_scale_center_x()
+  {
+    return this._scale_center_x;
+  }
+  
+  public float get_scale_center_y()
+  {
+    return this._scale_center_y;
+  }
+  
+  public float get_scale_factor()
+  {
+    return this._scale_factor;
   }
   
   public void set_step_size(float value)
