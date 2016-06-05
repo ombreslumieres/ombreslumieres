@@ -1,5 +1,6 @@
 Contributing to this Project
 ============================
+Coding style, etc. There are also a few performance tips in here.
 
 This file describes some development practices and coding standards for this project. Its syntax follows the rst format.
 
@@ -86,3 +87,16 @@ Libraries we use
  * oscP5
  * Syphon / Spout
  * controlP5
+
+
+Optimization
+------------
+What can make this sketch use less CPU, hence be faster:
+
+* make the step size bigger (5 pixels works well)
+* make the size of the sketch smaller
+* make the brush smaller (especially the eraser)
+* avoid using the eraser (it's very slow, since it iterates through the pixels)
+* have less brushes
+* we could change the code to use P3D renderer for the PGraphics in SprayCan, 
+  but then the brush will make the sketch look bad when we redraw over it.

@@ -27,3 +27,5 @@ How to draw straight lines
 
 It will create a straight line between the two dots.
 Make many lines if you want to make it darker.
+
+Press very hard and suddenly on the force sensor.
