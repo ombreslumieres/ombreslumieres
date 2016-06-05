@@ -28,6 +28,7 @@ class SprayCan
   private float _scale_center_y = 0.5;
   private float _scale_factor = 1.0;
   private int _layer = 0;
+  private boolean _enable_linked_strokes = false;
 
   /**
    * Represents a spray can.
@@ -89,6 +90,17 @@ class SprayCan
   {
     return this._layer;
   }
+  
+  public void set_enable_linked_strokes(boolean value)
+  {
+    this._enable_linked_strokes = value;
+  }
+  
+  public boolean get_enable_linked_strokes()
+  {
+    return this._enable_linked_strokes;
+  }
+  
 
   /**
    * Sets whether or not it is spraying.

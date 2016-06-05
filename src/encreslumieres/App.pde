@@ -329,9 +329,19 @@ class App
 
   public void mousePressed_cb(float mouse_x, float mouse_y)
   {
-    this._push_command((Command)
-        new NewStrokeCommand(MOUSE_GRAFFITI_IDENTIFIER));
     this._mouse_is_pressed = true;
+    
+    if (this._spray_cans.get(MOUSE_GRAFFITI_IDENTIFIER).get_enable_linked_strokes())
+    {
+      // no need to add a new node, since it will be added in the blob cb.
+      //this._push_command((Command)
+      //    new AddNodeCommand(MOUSE_GRAFFITI_IDENTIFIER, x, y));
+    }
+    else
+    {
+      this._push_command((Command)
+          new NewStrokeCommand(MOUSE_GRAFFITI_IDENTIFIER));
+    }
   }
 
   public void mouseReleased_cb(float mouse_x, float mouse_y)
@@ -351,8 +361,20 @@ class App
     {
       this.handle_redo(MOUSE_GRAFFITI_IDENTIFIER);
     }
+    else if (key == CODED && keyCode == SHIFT)
+    {
+      this.handle_enable_linked_strokes(MOUSE_GRAFFITI_IDENTIFIER, true);
+    }
   }
-
+  
+  public void keyReleased_cb()
+  {
+    if (key == CODED && keyCode == SHIFT)
+    {
+      this.handle_enable_linked_strokes(MOUSE_GRAFFITI_IDENTIFIER, true);
+    }
+  }
+  
   /**
    * Convert a X coordinate from blob range to display range.
    */
@@ -586,8 +608,17 @@ class App
         {
           println("FORCE: NEW STROKE");
         }
-        this._push_command((Command)
-            new NewStrokeCommand(spray_can_index)); // TODO: should we already create the first node, for faster response?
+        
+        // create the new stroke - or just add a new node in the previous stroke if linked strokes are enabled
+        if (spray_can.get_enable_linked_strokes())
+        {
+          // nothing to do
+        }
+        else
+        {
+          this._push_command((Command)
+              new NewStrokeCommand(spray_can_index)); // TODO: should we already create the first node, for faster response?
+        }
       }
     }
     else
@@ -605,6 +636,19 @@ class App
     {
       this._push_command((Command)
           new RedoCommand(spray_can_index));
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
+  }
+  
+  private void handle_enable_linked_strokes(int spray_can_index, boolean enable)
+  {
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      spray_can.set_enable_linked_strokes(enable);
     }
     else
     {
@@ -912,6 +956,16 @@ class App
         identifier = message.get(0).intValue();
         int value = message.get(1).intValue();
         this.handle_layer(identifier, value);
+      }
+    }
+    
+    else if (message.checkAddrPattern("/link_strokes"))
+    {
+      if (message.checkTypetag("ii"))
+      {
+        identifier = message.get(0).intValue();
+        boolean value = message.get(1).intValue() == 1;
+        this.handle_enable_linked_strokes(identifier, value);
       }
     }
     

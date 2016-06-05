@@ -59,3 +59,9 @@ void keyPressed()
 {
   app.keyPressed_cb();
 }
+
+
+void keyReleased()
+{
+  app.keyReleased_cb();
+}

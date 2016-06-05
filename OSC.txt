@@ -181,3 +181,19 @@ Sets the layer for a spray can.
 The default for all spray cans is 0.
 If the layer of a spray is 9, it will be drawn over all spray cans whose layer
 number if smaller than 9.
+
+
+link strokes
+------------
+Signature:
+/link_strokes ,ii
+
+Arguments:
+* Argument 1: spray identifier
+* Argument 2: enable it (1 enables it, 0 disables it)
+
+Description:
+Enables of disables the linked strokes for a spray can.
+The default for all spray cans is disabled.
+Every new stroke will be linked to the previous one with a straigth line, if
+enabled.
