@@ -124,7 +124,9 @@ It's the same for all spray cans.
 
 set step size
 -------------
+Signature:
 /set/step_size, if
+
 Arguments:
 * Argument 1: spray identifier
 
@@ -134,7 +136,9 @@ Sets the minimum distance between interpolated positions of nodes. (in pixels)
 
 scale factor
 ------------
+Signature:
 /scale/factor, if
+
 Arguments:
 * Argument 1: spray identifier
 * Argument 2: factor
@@ -148,7 +152,9 @@ A scale factor of 0.1 means that we can only paint in 1/10 of the sketch area.
 
 scale center
 ------------
+Signature:
 /scale/center, iff
+
 Arguments:
 * Argument 1: spray identifier
 * Argument 2: center x (in the range [0,1])
@@ -160,3 +166,18 @@ The default is (0.5, 0.5)
 For the Y scale, 0.0 is the top of the sketch and 1.0 is the bottom.
 For the X scale, 0.0 is the left of the sketch and 1.0 is the right.
 
+
+layer
+------------
+Signature:
+/layer ,ii
+
+Arguments:
+* Argument 1: spray identifier
+* Argument 2: layer number (within the range [0,9]
+
+Description:
+Sets the layer for a spray can.
+The default for all spray cans is 0.
+If the layer of a spray is 9, it will be drawn over all spray cans whose layer
+number if smaller than 9.

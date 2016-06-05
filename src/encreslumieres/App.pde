@@ -60,6 +60,7 @@ class App
   
   float MINIMUM_ALPHA = 0.0; // Here is the min/max alpha ratio according to force FSR pressure sensor
   float MAXIMUM_ALPHA = 0.6;
+  int MAX_LAYER = 10;
 
   /**
    * Constructor.
@@ -289,13 +290,24 @@ class App
       this._push_command((Command)
           new AddNodeCommand(MOUSE_GRAFFITI_IDENTIFIER, mouse_x, mouse_y)); // , float size
     }
+    // apply some commands in the queue, if needed.
+    // we use that queue since the OSC receiver is in a separate thread.
+    // TODO: create a queue of OSC messages instead of command - for a simpler code?
     this._consume_commands();
-
-    for (int i = 0; i < this._spray_cans.size(); i++)
+    
+    // draw the spray cans in the order to the layer they are on:
+    for (int layer = 0; layer < MAX_LAYER; layer++)
     {
-      // TODO: draw each spray can layer separately
-      this._spray_cans.get(i).draw_spraycan();
+      for (int i = 0; i < this._spray_cans.size(); i++)
+      {
+        SprayCan spray_can = this._spray_cans.get(i);
+        if (spray_can.get_layer() == layer)
+        {
+          spray_can.draw_spraycan();
+        }
+      }
     }
+    // we do not care about the layer number for the rendering order of the cursors
     for (int i = 0; i < this._spray_cans.size(); i++)
     {
       this._spray_cans.get(i).draw_cursor();
@@ -503,6 +515,30 @@ class App
       {
         this._push_command((Command)
             new AddNodeCommand(spray_can_index, mapped_x, mapped_y, size));
+      }
+    }
+    else
+    {
+      println("No such can index " + spray_can_index);
+    }
+  }
+  
+  /**
+   * Handles /layer OSC messages.
+   * @param layer_number index within the range [0,9]
+   */
+  private void handle_layer(int spray_can_index, int layer_number)
+  {
+    if (this.has_can_index(spray_can_index))
+    {
+      SprayCan spray_can = this._spray_cans.get(spray_can_index);
+      if (layer_number >= MAX_LAYER)
+      {
+        println("Layer number too big: " + MAX_LAYER);
+      }
+      else
+      {
+        spray_can.set_layer(layer_number);
       }
     }
     else
@@ -866,6 +902,16 @@ class App
         identifier = message.get(0).intValue();
         float value = message.get(1).floatValue();
         this.handle_scale_factor(identifier, value);
+      }
+    }
+    
+    else if (message.checkAddrPattern("/layer"))
+    {
+      if (message.checkTypetag("ii"))
+      {
+        identifier = message.get(0).intValue();
+        int value = message.get(1).intValue();
+        this.handle_layer(identifier, value);
       }
     }
     

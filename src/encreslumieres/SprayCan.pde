@@ -27,6 +27,7 @@ class SprayCan
   private float _scale_center_x = 0.5;
   private float _scale_center_y = 0.5;
   private float _scale_factor = 1.0;
+  private int _layer = 0;
 
   /**
    * Represents a spray can.
@@ -77,6 +78,16 @@ class SprayCan
   public void set_step_size(float value)
   {
     this._default_step_size = value;
+  }
+  
+  public void set_layer(int value)
+  {
+    this._layer = value;
+  }
+  
+  public int get_layer()
+  {
+    return this._layer;
   }
 
   /**
