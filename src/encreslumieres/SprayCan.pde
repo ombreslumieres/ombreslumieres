@@ -45,6 +45,10 @@ class SprayCan
     this._image_height = image_height;
     this._undo = new Undo(this.NUMBER_OF_UNDO_LEVELS, this._image_width, this._image_height);
     this._buffer = createGraphics(this._image_width, this._image_height);
+    
+    this._buffer.beginDraw();
+    this._buffer.background(0, 0, 0, 0);
+    this._buffer.endDraw();
   }
   
   /**

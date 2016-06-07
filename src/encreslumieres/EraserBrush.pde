@@ -10,7 +10,7 @@ class EraserBrush extends Brush
   
   public final void draw_brush(PGraphics buffer, float x, float y, float size, color colour)
   {
-    color c = color(0, 0); // transparent
+    color c = color(0, 0, 0, 0); // transparent black
     float radius = size / 2.0;
     //canvas.beginDraw();
     buffer.loadPixels();
