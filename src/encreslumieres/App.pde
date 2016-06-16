@@ -110,6 +110,8 @@ class App
   
   private void _consume_commands()
   {
+    // Happens in the draw_cb thread.
+    
     final int MAX_COMMANDS = 1000;
     for (int i = 0; i < MAX_COMMANDS; i ++)
     {
@@ -364,6 +366,10 @@ class App
     else if (key == CODED && keyCode == SHIFT)
     {
       this.handle_enable_linked_strokes(MOUSE_GRAFFITI_IDENTIFIER, true);
+    }
+    else if (key == 'x' || key == 'X')
+    {
+      this.handle_clear(MOUSE_GRAFFITI_IDENTIFIER);
     }
   }
   

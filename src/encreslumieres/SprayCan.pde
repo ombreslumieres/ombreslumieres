@@ -227,10 +227,12 @@ class SprayCan
    */
   public void clear_all_strokes()
   {
-    for (Stroke stroke : this._strokes)
-    {
-      stroke.clear_stroke();
-    }
+    //for (Stroke stroke : this._strokes)
+    //{
+      // Uneeded
+      // And seems to cause a NullPointerException - sometimes when we have been drawing a bit
+      // stroke.clear_stroke();
+    //}
     this._strokes.clear();
     this._buffer = createGraphics(this._image_width, this._image_height, P3D);
     
