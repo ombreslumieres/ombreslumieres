@@ -44,7 +44,7 @@ class SprayCan
     this._image_width = image_width;
     this._image_height = image_height;
     this._undo = new Undo(this.NUMBER_OF_UNDO_LEVELS, this._image_width, this._image_height);
-    this._buffer = createGraphics(this._image_width, this._image_height);
+    this._buffer = createGraphics(this._image_width, this._image_height); // we used to use the P3D renderer, as a 3rd argument
     
     this._buffer.beginDraw();
     this._buffer.background(0, 0, 0, 0);
