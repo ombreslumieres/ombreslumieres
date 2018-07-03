@@ -7,7 +7,7 @@
  * @date 2016-03-16
  * 
  * - Start the Arduino IDE and open the Preferences window.
- * - Enter the following URL: http://arduino.esp8266.com/package_esp8266com_index.json 
+ * - Enter the following URL: http://arduino.esp8266.com/stable/package_esp8266com_index.json 
  *   into Additional Board Manager URLs field.
  * - Open Boards Manager from Tools > Board menu and install the esp8266 platform.
  * - Choose the Olimex MOD-WIFI-ESP8266(-DEV) board type
