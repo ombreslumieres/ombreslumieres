@@ -12,16 +12,15 @@ import controlP5.ControlEvent;
 import controlP5.ColorPicker;
 
 final int OSC_RECEIVE_PORT = 31232;
-final int OSC_SEND_PORT = 31340;
+final int OSC_SEND_PORT = 8888;
 final String OSC_SEND_HOST = "127.0.0.1";
 final int MIN_BRUSH_WEIGHT = 40;
 final int MAX_BRUSH_WEIGHT = 200;
 final int BRUSH_WEIGHT_STEP = 10;
 final int DEFAULT_IDENTIFIER = 0;
 final boolean VERBOSE = false;
-// FIXME: if force < 400, it means it's pressed. Counter-intuitive, I know.
 final int FORCE_IF_PRESSED = 800;
-final int FORCE_IF_NOT_PRESSED = 1023;
+final int FORCE_IF_NOT_PRESSED = 0;
 final float BRUSH_SCALE = 0.3; // FIXME: ratio taken from Knot.pde (not quite right)
 
 ControlP5 control_p5;
@@ -29,16 +28,16 @@ ColorPicker color_picker;
 NetAddress osc_send_address;
 OscP5 osc_receiver;
 boolean force_is_pressed = false;
-float blob_x = 0.0;
-float blob_y = 0.0;
-float blob_size = 100.0;
+int blob_x = 0;
+int blob_y = 0;
+int blob_size = 100;
 int brush_weight = 100;
-int current_identifier = 0;
+int current_identifier = 1;
 color color_sent;
 
 void setup()
 {
-  size(640, 480);
+  size(720, 480);
   frameRate(30);
   // start oscP5, listening for incoming messages at a given port
   osc_receiver = new OscP5(this, OSC_RECEIVE_PORT);
@@ -77,7 +76,7 @@ public void controlEvent(ControlEvent c)
     int g = int(c.getArrayValue(1));
     int b = int(c.getArrayValue(2));
     int a = int(c.getArrayValue(3));
-    color col = color(r, g, b, a);
+    // color col = color(r, g, b, a);
     send_color(r, g, b); // TODO: a
     // println("event\talpha:"+a+"\tred:"+r+"\tgreen:"+g+"\tblue:"+b+"\tcol"+col);
   }
@@ -104,7 +103,7 @@ void draw_head_up_display()
   text("Send to osc.udp://" + OSC_SEND_HOST + ":" + OSC_SEND_PORT, x_pos, 20);
   text("/blob " + current_identifier + " " + blob_x + " " + blob_y + " " + blob_size, x_pos, 40);
   text("/brush/weight " + current_identifier + " " + brush_weight, x_pos, 60);
-  text("/force " + current_identifier + " " + force_value, x_pos, 80);
+  text("/" + current_identifier + "/raw " + force_value + " (force)", x_pos, 80);
   text("/color " + current_identifier + " " + red(color_sent) + " " + green(color_sent) + " " + blue(color_sent), x_pos, 100);
 }
 
@@ -233,19 +232,57 @@ void send_brush_weight()
 
 void send_force()
 {
-  OscMessage message = new OscMessage("/force");
-  message.add(current_identifier);
+  OscMessage message = new OscMessage("/" + current_identifier + "/raw");
+  // message.add(current_identifier);
+  
+  // Typetags: ffffffffffffffffffffff (22 floats)
+  
+  // Indices 0-4:
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  
+  // Indices 5-9:
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  
+  // Index 10-11:
+  message.add(0.0);
+  message.add(0.0);
+  
   if (force_is_pressed)
   {
-    message.add(FORCE_IF_PRESSED);
+    message.add((float) FORCE_IF_PRESSED);
   }
   else
   {
-    message.add(FORCE_IF_NOT_PRESSED);
+    message.add((float) FORCE_IF_NOT_PRESSED);
   }
+
+  // Indices 13-14:
+  message.add(0.0);
+  message.add(0.0);
+  
+  // Indices 15-19
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  message.add(0.0);
+  
+  // Index 20-21:
+  message.add(0.0);
+  message.add(0.0);
+  
   if (VERBOSE)
   {
-    println("/force " + current_identifier + " " + "?");
+    println("/" + current_identifier + "/raw " + current_identifier + " " + "?");
   }
+  
   osc_receiver.send(message, osc_send_address);
 }
